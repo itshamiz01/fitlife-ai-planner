@@ -27,6 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build app
+        env:
+          GITHUB_PAGES: 'true'
         run: npm run build
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
