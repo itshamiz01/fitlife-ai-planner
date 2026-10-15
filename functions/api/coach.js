@@ -8,9 +8,9 @@ const json = (body, status = 200) => new Response(JSON.stringify(body), {
 });
 
 export async function onRequestPost({ request, env }) {
-  if (!env.GEMINI_API_KEY) {
+  if (!env.OPENROUTER_API_KEY) {
     return json({
-      error: "The AI service is not configured yet. Add GEMINI_API_KEY to Cloudflare Pages environment secrets."
+      error: "The AI service is not configured yet. Add OPENROUTER_API_KEY to Cloudflare Pages environment secrets."
     }, 503);
   }
 
@@ -58,23 +58,26 @@ SAFETY AND ACCURACY RULES:
 7. Use metric units by default and Indian food examples where appropriate. Distinguish general evidence from uncertainty; never invent studies or citations.
 8. Keep answers organized and actionable. Educational fitness guidance only, not a substitute for individual medical care.`;
 
-  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+  const endpoint = "https://openrouter.ai/api/v1/chat/completions";
+  const model = env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
   let upstream;
   try {
     upstream = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": env.GEMINI_API_KEY
+        "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://itshamiz01.github.io/fitlife-ai-planner/",
+        "X-Title": "FitLife AI Planner"
       },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents: [{ role: "user", parts: [{ text: message }] }],
-        generationConfig: {
-          temperature: 0.35,
-          maxOutputTokens: 1400,
-          responseMimeType: "text/plain"
-        }
+        model,
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: message }
+        ],
+        temperature: 0.35,
+        max_tokens: 1400
       })
     });
   } catch {
@@ -91,13 +94,11 @@ SAFETY AND ACCURACY RULES:
     }, upstream.status === 429 ? 429 : 502);
   }
 
-  const reply = data?.candidates?.[0]?.content?.parts
-    ?.map((part) => typeof part.text === "string" ? part.text : "")
-    .join("")
-    .trim();
+  const reply = data?.choices?.[0]?.message?.content;
+  const cleanReply = typeof reply === "string" ? reply.trim() : "";
 
-  if (!reply) return json({ error: "The AI coach returned no answer. Please try again." }, 502);
-  return json({ reply });
+  if (!cleanReply) return json({ error: "The AI coach returned no answer. Please try again." }, 502);
+  return json({ reply: cleanReply });
 }
 
 export async function onRequest({ request }) {
