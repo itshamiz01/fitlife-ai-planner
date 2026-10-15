@@ -477,7 +477,7 @@ export default function App() {
 
   const handleSendChatMessage = async (presetText) => {
     const query = presetText || chatInput.trim();
-    if (!query) return;
+    if (!query || isChatLoading) return;
 
     const userMessage = { sender: 'user', text: query };
     setChatMessages((prev) => [...prev, userMessage]);
@@ -485,71 +485,59 @@ export default function App() {
     setIsChatLoading(true);
 
     try {
-      const systemInstruction = `You are FitLife AI, an empathetic, certified, evidence-based sports nutritionist and health coach.
-User Context:
-- Name: ${profile.name}
-- Age: ${profile.age}, Sex: ${profile.sex}
-- Height: ${profile.heightCm} cm, Current Weight: ${profile.currentWeightKg} kg, Target: ${profile.targetWeightKg} kg
-- Diet: ${profile.dietaryPreference}, Cuisines: ${profile.preferredCuisines.join(', ')}
-- Goal: ${profile.primaryGoal}, Activity: ${profile.activityLevel}
-- Target Calories: ${calculations.goalCalData.targetCalories} kcal (Protein: ${calculations.macros.protein.grams}g, Carbs: ${calculations.macros.carbs.grams}g, Fat: ${calculations.macros.fat.grams}g)
-- Allergies: ${profile.allergies.join(', ') || 'None'}
+      if (!profile.onboarded) {
+        throw new Error('Please complete your profile first so the coach can use your actual details.');
+      }
 
-Rules:
-1. Always offer compassionate, science-backed guidance prioritizing long-term adherence and a positive relationship with food.
-2. Support regional foods (like Dal, Roti, Paneer, Chana, Idli, Quinoa, Oats).
-3. If asked for a meal substitution, match the macronutrients closely.
-4. Maintain a clear wellness disclaimer: clarify this is educational fitness guidance, not clinical medical advice. Never prescribe extreme caloric deficit (<1200 kcal) or diagnose medical conditions.
-5. Keep responses concise, well-structured, formatted with neat bullet points.`;
-
-      const apiKey = "";
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-      const payload = {
-        contents: [
-          {
-            parts: [{ text: query }]
-          }
-        ],
-        systemInstruction: {
-          parts: [{ text: systemInstruction }]
-        }
-      };
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch(new URL('/api/coach', window.location.origin), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          message: query,
+          profile: {
+            name: profile.name,
+            age: profile.age,
+            sex: profile.sex,
+            heightCm: profile.heightCm,
+            currentWeightKg: profile.currentWeightKg,
+            targetWeightKg: profile.targetWeightKg,
+            dietaryPreference: profile.dietaryPreference,
+            preferredCuisines: profile.preferredCuisines,
+            allergies: profile.allergies,
+            religiousRestrictions: profile.religiousRestrictions,
+            primaryGoal: profile.primaryGoal,
+            activityLevel: profile.activityLevel,
+            workoutPreference: profile.workoutPreference,
+            fitnessExperience: profile.fitnessExperience,
+            workoutDaysPerWeek: profile.workoutDaysPerWeek,
+            sleepHours: profile.sleepHours,
+            healthConditions: profile.healthConditions
+          },
+          targets: {
+            calories: calculations.goalCalData.targetCalories,
+            proteinGrams: calculations.macros.protein.grams,
+            carbsGrams: calculations.macros.carbs.grams,
+            fatGrams: calculations.macros.fat.grams,
+            hydrationMl: calculations.hydration
+          }
+        })
       });
 
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        throw new Error(data.error || (response.status === 404
+          ? 'The AI service is not connected to this website yet. Deploy the Cloudflare Pages backend and add the GEMINI_API_KEY secret.'
+          : 'The AI service is temporarily unavailable. Please try again shortly.'));
       }
-
-      const data = await response.json();
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (reply) {
-        setChatMessages((prev) => [...prev, { sender: 'bot', text: reply }]);
-      } else {
-        throw new Error('Empty response from model');
+      if (typeof data.reply !== 'string' || !data.reply.trim()) {
+        throw new Error('The AI coach returned an empty answer. Please try again.');
       }
+      setChatMessages((prev) => [...prev, { sender: 'bot', text: data.reply.trim() }]);
     } catch (err) {
-      // Fallback response with reliable domain logic
-      const fallbackReplies = {
-        sub: `For ${profile.dietaryPreference} meal substitutions, you can swap 100g of Paneer (approx 18g Protein, 20g Fat) with 150g of Firm Tofu (18g Protein, 8g Fat + add 1 tsp olive oil or 6-8 crushed almonds to match healthy fats).`,
-        plateau: `Weight fluctuations are normal and often caused by water retention, cortisol, or glycogen shifts. Continue tracking your weekly rolling averages rather than daily peaks, and consider taking a 2-day diet break at maintenance (${calculations.tdee} kcal).`,
-        default: `As your FitLife AI coach, remember that sustainable progress is built on consistency rather than perfection. Your target of ${calculations.goalCalData.targetCalories} kcal provides an optimal, healthy balance for your body without metabolic slowdown. Feel free to ask about recipe swaps, workout form, or hydration!`
-      };
-
-      let fallbackText = fallbackReplies.default;
-      if (query.toLowerCase().includes('substitute') || query.toLowerCase().includes('swap')) {
-        fallbackText = fallbackReplies.sub;
-      } else if (query.toLowerCase().includes('stuck') || query.toLowerCase().includes('plateau')) {
-        fallbackText = fallbackReplies.plateau;
-      }
-
-      setChatMessages((prev) => [...prev, { sender: 'bot', text: fallbackText }]);
+      setChatMessages((prev) => [...prev, {
+        sender: 'bot',
+        text: err.message || 'I could not reach the AI service. Please try again when the connection is restored.'
+      }]);
     } finally {
       setIsChatLoading(false);
     }
