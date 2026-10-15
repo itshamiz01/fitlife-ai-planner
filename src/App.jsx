@@ -36,28 +36,12 @@ import {
 } from 'lucide-react';
 
 const DEFAULT_PROFILE = {
-  name: 'Alex Johnson',
-  age: 29,
-  sex: 'male', // 'male' | 'female'
-  heightCm: 175,
-  currentWeightKg: 78,
-  targetWeightKg: 72,
-  activityLevel: 'moderate', // 'sedentary' | 'light' | 'moderate' | 'active' | 'extra_active'
-  primaryGoal: 'lose_weight', // 'lose_weight' | 'maintain' | 'gain_muscle'
-  country: 'India',
-  unitSystem: 'metric', // 'metric' | 'imperial'
-  dietaryPreference: 'vegetarian', // 'vegetarian' | 'vegan' | 'eggetarian' | 'pescatarian' | 'non_vegetarian'
-  allergies: ['Peanuts'],
-  religiousRestrictions: 'None',
-  preferredCuisines: ['Indian', 'Mediterranean'],
-  foodBudget: 'moderate', // 'budget' | 'moderate' | 'premium'
-  workoutPreference: 'mixed', // 'home' | 'gym' | 'mixed'
-  fitnessExperience: 'intermediate', // 'beginner' | 'intermediate' | 'advanced'
-  equipment: ['Dumbbells', 'Yoga Mat', 'Resistance Bands'],
-  workoutDaysPerWeek: 4,
-  sleepHours: 7.5,
-  healthConditions: 'None',
-  onboarded: true
+  // Safe calculation defaults only. First-time users enter their own details in onboarding.
+  name: '', age: 25, sex: 'male', heightCm: 170, currentWeightKg: 70, targetWeightKg: 70,
+  activityLevel: 'sedentary', primaryGoal: 'maintain', country: 'India', unitSystem: 'metric',
+  dietaryPreference: 'vegetarian', allergies: [], religiousRestrictions: 'None', preferredCuisines: ['Indian'],
+  foodBudget: 'budget', workoutPreference: 'home', fitnessExperience: 'beginner', equipment: [],
+  workoutDaysPerWeek: 3, sleepHours: 7, healthConditions: 'None', onboarded: false
 };
 
 // Activity multipliers for Mifflin-St Jeor TDEE calculation
@@ -409,33 +393,29 @@ function calculateTimeline(currentKg, targetKg, weeklyPaceKg) {
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [profile, setProfile] = useState(DEFAULT_PROFILE);
-  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [profile, setProfile] = useState(() => {
+    try { const saved = localStorage.getItem('fitlife-profile-v2'); return saved ? { ...DEFAULT_PROFILE, ...JSON.parse(saved) } : DEFAULT_PROFILE; }
+    catch { return DEFAULT_PROFILE; }
+  });
+  const [showOnboardingModal, setShowOnboardingModal] = useState(() => !profile.onboarded);
   const [showLogWeightModal, setShowLogWeightModal] = useState(false);
   const [showMealDetailsModal, setShowMealDetailsModal] = useState(null);
 
   // Daily tracker state
-  const [todayWaterLoggedMl, setTodayWaterLoggedMl] = useState(1750);
-  const [completedWorkouts, setCompletedWorkouts] = useState(['Day 1']);
+  const [todayWaterLoggedMl, setTodayWaterLoggedMl] = useState(0);
+  const [completedWorkouts, setCompletedWorkouts] = useState([]);
   const [selectedWorkoutMode, setSelectedWorkoutMode] = useState('home');
   const [selectedDietDayIndex, setSelectedDietDayIndex] = useState(0);
 
   // Weight history log
-  const [weightLogs, setWeightLogs] = useState([
-    { date: '2026-09-01', weight: 81.2 },
-    { date: '2026-09-08', weight: 80.5 },
-    { date: '2026-09-15', weight: 79.8 },
-    { date: '2026-09-22', weight: 79.1 },
-    { date: '2026-09-29', weight: 78.4 },
-    { date: '2026-10-06', weight: 78.0 }
-  ]);
+  const [weightLogs, setWeightLogs] = useState([]);
   const [newWeightInput, setNewWeightInput] = useState('');
 
   // AI Chat Assistant state
   const [chatMessages, setChatMessages] = useState([
     {
       sender: 'bot',
-      text: `Hello ${DEFAULT_PROFILE.name}! I'm FitLife AI, your personal health and nutrition companion. Based on your goal of sustainable weight management and vegetarian preference, how can I assist you with your diet, recipes, or training today?`
+      text: "Hi! I am FitLife AI, your personal health and fitness companion. Complete your profile first so I can tailor guidance to your details."
     }
   ]);
   const [chatInput, setChatInput] = useState('');
@@ -463,9 +443,9 @@ export default function App() {
     const initialWeight = weightLogs[0]?.weight || profile.currentWeightKg;
     const totalGoalLoss = initialWeight - profile.targetWeightKg;
     const currentProgressKg = initialWeight - profile.currentWeightKg;
-    const progressPercent = totalGoalLoss > 0
+    const progressPercent = weightLogs.length > 0 && totalGoalLoss > 0
       ? Math.min(100, Math.max(0, Math.round((currentProgressKg / totalGoalLoss) * 100)))
-      : 100;
+      : 0;
 
     return {
       bmr,
@@ -479,6 +459,16 @@ export default function App() {
       progressPercent
     };
   }, [profile, weightLogs]);
+
+  // Save each user's profile in their own browser, using a new key to avoid old demo data.
+  useEffect(() => {
+    if (profile.onboarded) { try { localStorage.setItem('fitlife-profile-v2', JSON.stringify(profile)); } catch { /* storage may be unavailable */ } }
+  }, [profile]);
+
+  // Start the weight timeline with the user's actual starting weight, not demo history.
+  useEffect(() => {
+    if (profile.onboarded && weightLogs.length === 0) setWeightLogs([{ date: new Date().toISOString().split('T')[0], weight: Number(profile.currentWeightKg) }]);
+  }, [profile.onboarded]);
 
   // Scroll AI chat to bottom
   useEffect(() => {
@@ -630,11 +620,11 @@ Rules:
           {/* Quick Profile Overview Badge */}
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => setShowLogWeightModal(true)}
+              onClick={() => profile.onboarded ? setShowLogWeightModal(true) : setShowOnboardingModal(true)}
               className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium border border-slate-700 text-slate-200 transition-all hover:border-emerald-500/50"
             >
               <Scale className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Log Weight ({profile.currentWeightKg} kg)</span>
+              <span>{profile.onboarded ? `Log Weight (${profile.currentWeightKg} kg)` : 'Set Up Profile'}</span>
             </button>
 
             <button
@@ -643,10 +633,10 @@ Rules:
               title="Edit Profile"
             >
               <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xs">
-                {profile.name[0]}
+                {profile.name?.[0] || '?'}
               </div>
               <span className="text-xs font-medium hidden md:inline text-slate-300">
-                {profile.name}
+                {profile.name || 'Set up profile'}
               </span>
             </button>
           </div>
@@ -1921,6 +1911,33 @@ function LogWeightModal({ currentWeight, newWeightInput, setNewWeightInput, onCl
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-slate-300 block mb-1 font-semibold">Primary Goal</label>
+              <select value={formData.primaryGoal} onChange={(e) => setFormData({ ...formData, primaryGoal: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none">
+                <option value="lose_weight">Lose Weight</option><option value="maintain">Maintain Weight</option><option value="gain_muscle">Build Muscle</option>
+              </select>
+            </div>
+            <div><label className="text-slate-300 block mb-1 font-semibold">Activity Level</label>
+              <select value={formData.activityLevel} onChange={(e) => setFormData({ ...formData, activityLevel: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none">
+                <option value="sedentary">Mostly Sitting</option><option value="light">Lightly Active</option><option value="moderate">Moderately Active</option><option value="active">Very Active</option><option value="extra_active">Extremely Active</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="text-slate-300 block mb-1 font-semibold">Workout Location</label>
+              <select value={formData.workoutPreference} onChange={(e) => setFormData({ ...formData, workoutPreference: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none">
+                <option value="home">Home</option><option value="gym">Gym</option><option value="mixed">Both</option>
+              </select>
+            </div>
+            <div><label className="text-slate-300 block mb-1 font-semibold">Fitness Experience</label>
+              <select value={formData.fitnessExperience} onChange={(e) => setFormData({ ...formData, fitnessExperience: e.target.value })} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none">
+                <option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option>
+              </select>
+            </div>
+          </div>
+          <div><label className="text-slate-300 block mb-1 font-semibold">Food Allergies (comma-separated)</label>
+            <input type="text" value={(formData.allergies || []).join(', ')} onChange={(e) => setFormData({ ...formData, allergies: e.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} placeholder="e.g. peanuts, dairy, none" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none" />
+          </div>
           <div className="flex space-x-2 pt-2">
             <button
               type="button"
@@ -2067,12 +2084,22 @@ function GroceryModal({ groceryList, onClose, showToast }) {
 }
 
 function ProfileModal({ profile, setProfile, onClose, showToast }) {
-  const [formData, setFormData] = useState({ ...profile });
+  const [formData, setFormData] = useState(() => profile.onboarded
+    ? { ...profile, allergies: [...(profile.allergies || [])] }
+    : { ...profile, name: '', age: '', heightCm: '', currentWeightKg: '', targetWeightKg: '', allergies: [] }
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setProfile(formData);
-    showToast('Health Profile successfully updated!');
+    const age = Number(formData.age), heightCm = Number(formData.heightCm);
+    const currentWeightKg = Number(formData.currentWeightKg), targetWeightKg = Number(formData.targetWeightKg);
+    if (!formData.name.trim()) return showToast('Please enter your name.');
+    if (!Number.isFinite(age) || age < 13 || age > 100) return showToast('Please enter an age between 13 and 100.');
+    if (!Number.isFinite(heightCm) || heightCm < 100 || heightCm > 250) return showToast('Please enter a height between 100 and 250 cm.');
+    if (!Number.isFinite(currentWeightKg) || currentWeightKg < 30 || currentWeightKg > 300) return showToast('Please enter a current weight between 30 and 300 kg.');
+    if (!Number.isFinite(targetWeightKg) || targetWeightKg < 30 || targetWeightKg > 300) return showToast('Please enter a target weight between 30 and 300 kg.');
+    setProfile({ ...formData, name: formData.name.trim(), age, heightCm, currentWeightKg, targetWeightKg, onboarded: true });
+    showToast('Your personal health profile is ready!');
     onClose();
   };
 
@@ -2081,8 +2108,8 @@ function ProfileModal({ profile, setProfile, onClose, showToast }) {
       <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 max-w-lg w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
           <div>
-            <h3 className="text-lg font-bold text-white">Edit Health & Fitness Profile</h3>
-            <p className="text-xs text-slate-400">Update parameters to recalibrate your metabolic equations.</p>
+            <h3 className="text-lg font-bold text-white">{profile.onboarded ? 'Edit Health & Fitness Profile' : 'Set Up Your FitLife Profile'}</h3>
+            <p className="text-xs text-slate-400">Enter your own details to personalize your plans. No demo profile or tracking history is preloaded.</p>
           </div>
           <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-white">
             ✕
@@ -2105,7 +2132,7 @@ function ProfileModal({ profile, setProfile, onClose, showToast }) {
               <input
                 type="number"
                 value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) || 25 })}
+                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-white outline-none"
               />
             </div>
@@ -2128,7 +2155,7 @@ function ProfileModal({ profile, setProfile, onClose, showToast }) {
               <input
                 type="number"
                 value={formData.heightCm}
-                onChange={(e) => setFormData({ ...formData, heightCm: parseFloat(e.target.value) || 170 })}
+                onChange={(e) => setFormData({ ...formData, heightCm: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-white outline-none"
               />
             </div>
@@ -2141,7 +2168,7 @@ function ProfileModal({ profile, setProfile, onClose, showToast }) {
                 type="number"
                 step="0.1"
                 value={formData.currentWeightKg}
-                onChange={(e) => setFormData({ ...formData, currentWeightKg: parseFloat(e.target.value) || 70 })}
+                onChange={(e) => setFormData({ ...formData, currentWeightKg: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-white outline-none"
               />
             </div>
@@ -2151,7 +2178,7 @@ function ProfileModal({ profile, setProfile, onClose, showToast }) {
                 type="number"
                 step="0.1"
                 value={formData.targetWeightKg}
-                onChange={(e) => setFormData({ ...formData, targetWeightKg: parseFloat(e.target.value) || 68 })}
+                onChange={(e) => setFormData({ ...formData, targetWeightKg: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-white outline-none"
               />
             </div>
@@ -2196,7 +2223,7 @@ function ProfileModal({ profile, setProfile, onClose, showToast }) {
               type="submit"
               className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold shadow-md shadow-emerald-500/20"
             >
-              Apply Updates
+              {profile.onboarded ? 'Apply Updates' : 'Save My Profile'}
             </button>
           </div>
         </form>
