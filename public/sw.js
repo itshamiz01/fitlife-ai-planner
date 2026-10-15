@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fitlife-shell-v1';
+const CACHE_NAME = 'fitlife-shell-v2';
 const APP_BASE = new URL('./', self.location.href);
 const APP_SHELL = [
   new URL('./', APP_BASE).toString(),
