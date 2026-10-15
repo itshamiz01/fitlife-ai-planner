@@ -1170,8 +1170,33 @@ function DietPlanView({
     { key: 'postWorkout', label: 'Post-Workout Fuel', icon: '⚡', meal: currentDayPlan.meals.postWorkout }
   ];
 
-  const totalDayCalories = mealSlots.reduce((acc, slot) => acc + (slot.meal?.cal || 0), 0);
-  const totalDayProtein = mealSlots.reduce((acc, slot) => acc + (slot.meal?.p || 0), 0);
+  // Conservative text screening for obvious conflicts with declared allergies.
+  // It cannot detect hidden ingredients or cross-contamination.
+  const allergenTerms = (profile.allergies || []).map((item) => String(item).toLowerCase().trim()).filter(Boolean);
+  const allergyAliases = {
+    peanut: ['peanut', 'groundnut', 'moongphali'],
+    milk: ['milk', 'dairy', 'paneer', 'curd', 'yogurt', 'ghee', 'whey', 'buttermilk', 'chhaas'],
+    dairy: ['milk', 'dairy', 'paneer', 'curd', 'yogurt', 'ghee', 'whey', 'buttermilk', 'chhaas'],
+    egg: ['egg', 'eggs'],
+    soy: ['soy', 'soya', 'tofu'],
+    wheat: ['wheat', 'atta', 'roti', 'bread', 'gluten'],
+    gluten: ['wheat', 'atta', 'roti', 'bread', 'gluten', 'barley'],
+    almond: ['almond'],
+    'tree nuts': ['almond', 'walnut', 'cashew', 'pistachio', 'hazelnut', 'pecan'],
+    cashew: ['cashew'],
+    sesame: ['sesame', 'tahini', 'til']
+  };
+  const isMealSafe = (meal) => {
+    if (!meal || allergenTerms.length === 0) return true;
+    const ingredientsText = [meal.name, ...(meal.ingredients || [])].join(' ').toLowerCase();
+    return !allergenTerms.some((allergen) => {
+      const terms = allergyAliases[allergen] || [allergen];
+      return terms.some((term) => term.length > 1 && ingredientsText.includes(term));
+    });
+  };
+  const safeMealSlots = mealSlots.map((slot) => ({ ...slot, allergyExcluded: !isMealSafe(slot.meal) }));
+  const totalDayCalories = safeMealSlots.reduce((acc, slot) => acc + (!slot.allergyExcluded ? (slot.meal?.cal || 0) : 0), 0);
+  const totalDayProtein = safeMealSlots.reduce((acc, slot) => acc + (!slot.allergyExcluded ? (slot.meal?.p || 0) : 0), 0);
 
   return (
     <div className="space-y-6">
@@ -1185,7 +1210,7 @@ function DietPlanView({
             </span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Engineered around your daily {calculations.goalCalData.targetCalories} kcal budget with regional, affordable ingredients.
+            Template meal ideas with estimated nutrition. Your calorie target is a separate estimate; portions and totals may need adjustment.
           </p>
         </div>
 
@@ -1238,9 +1263,15 @@ function DietPlanView({
 
       {/* Meal Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mealSlots.map((slot) => {
+        {safeMealSlots.map((slot) => {
           const { meal } = slot;
           if (!meal) return null;
+          if (slot.allergyExcluded) return (
+            <div key={slot.key} className="bg-amber-950/40 rounded-2xl p-5 border border-amber-700/60">
+              <div className="font-bold text-amber-200">{slot.label}: Excluded for allergy safety</div>
+              <p className="text-sm text-amber-100/80 mt-2">The listed meal mentions an ingredient matching an allergy in your profile. Choose a verified safe alternative. This text check cannot detect hidden ingredients or cross-contamination.</p>
+            </div>
+          );
 
           return (
             <div
