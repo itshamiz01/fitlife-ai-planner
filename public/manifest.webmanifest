@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "FitLife AI Planner",
+  "short_name": "FitLife",
+  "description": "Your personal fitness, nutrition, hydration, and workout planner.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "categories": [
+    "health",
+    "fitness",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "./fitlife-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
