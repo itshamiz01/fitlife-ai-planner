@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { compatibleRecipe, foodById, recipes } from "@/lib/food-catalog";
+import { compatibleRecipe, foodById, libraryRecipes } from "@/lib/food-catalog";
 import { substituteIngredient, substitutionOptions } from "@/lib/ingredient-substitutions";
 import { scaleIngredients, dietaryClass, savedServingBase } from "@/lib/recipe-serving";
 import { rupees, type MealIngredient, type Profile } from "@/lib/types";
@@ -8,7 +8,7 @@ import { rupees, type MealIngredient, type Profile } from "@/lib/types";
 type Props = { recipeId: string | null; ingredients: MealIngredient[]; fallbackInstructions: string; childMode?: boolean; baseLabel?: string; onSaveServings?: (servings: number) => void; saving?: boolean; profile?: Profile; onSubstitute?: (index: number, foodId: string) => void };
 export default function RecipeGuide({ recipeId, ingredients, fallbackInstructions, childMode = false, baseLabel = "saved plan portion", onSaveServings, saving = false, profile, onSubstitute }: Props) {
   const [servings, setServings] = useState(ingredients[0]?.servingCount ?? 1);
-  const recipe = recipes.find(item => item.id === recipeId);
+  const recipe = libraryRecipes.find(item => item.id === recipeId);
   const scaled = scaleIngredients(onSaveServings ? savedServingBase(ingredients) : ingredients, servings);
   const allergens = [...new Set(scaled.ingredients.flatMap(item => item.allergens))];
   return <div className="recipe-guide">

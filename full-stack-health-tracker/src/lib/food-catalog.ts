@@ -64,6 +64,15 @@ export const recipes: Recipe[] = [
   r("egg-banana", "Boiled eggs & banana", ["Snack"], [["egg",100],["banana",100]], "Boil eggs until fully cooked. Serve with peeled banana. Two large eggs are roughly 100 g raw edible egg before cooking.", "/images/banana-oats.jpg", "Eggetarian option"),
   ...expandedRecipes,
 ];
+// Individual foods are browsable references, not automatic plan candidates: a single
+// fruit or egg portion should not silently replace a balanced generated meal.
+export const individualFoods: Recipe[] = [
+  r("boiled-eggs", "Boiled eggs", ["Snack"], [["egg",100]], "Boil eggs until both yolks and whites are firm. One reference serving uses about 100 g raw edible egg, approximately two large eggs; actual weights vary.", "", "Individual food"),
+  r("banana-fruit", "Banana", ["Snack"], [["banana",100]], "Peel the banana and serve. The reference quantity is 100 g edible portion; actual fruit sizes vary.", "", "Individual food"),
+  r("papaya-fruit", "Papaya", ["Snack"], [["papaya",150]], "Wash, peel and remove seeds from ripe papaya before serving. The reference quantity is 150 g edible portion.", "", "Individual food"),
+];
+export const libraryRecipes = [...recipes, ...individualFoods];
+
 const allergyAliases: Record<string, string[]> = {
   milk: ["milk", "dairy", "lactose"], eggs: ["egg", "eggs"], gluten: ["gluten", "wheat", "celiac", "coeliac"],
   peanuts: ["peanut", "peanuts", "groundnut", "groundnuts"], "tree-nuts": ["tree nuts", "almond", "almonds", "cashew", "cashews", "walnut", "walnuts"],

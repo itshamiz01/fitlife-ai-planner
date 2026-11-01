@@ -17,6 +17,18 @@ for(const diet of ['vegan','vegetarian','eggetarian','nonvegetarian'])for(const 
  }else assert.ok(info.minimumDailyPaise===null||info.minimumDailyPaise>budget);
 }
 console.log(`✓ ${plans} feasible plans across 112 diet/budget/energy combinations; all 7-day totals and nutrition/price arithmetic match`);
+
+// With a diverse affordable catalog, do not repeat yesterday's recipes in any slot.
+for (const diet of ['vegan','vegetarian','eggetarian','nonvegetarian']) {
+ const p={...profile,diet,foodBudgetPaise:15000}; const varied=buildMealPlan(p);
+ assert.deepEqual(varied,buildMealPlan(p),`${diet}: deterministic`);
+ for(let day=0;day<7;day++) {
+  const current=varied.filter(m=>m.day===day);
+  assert.equal(new Set(current.map(m=>m.recipeId)).size,current.length,`${diet} day ${day}: duplicate`);
+  if(day){const previous=new Set(varied.filter(m=>m.day===day-1).map(m=>m.recipeId));assert.ok(current.every(m=>!previous.has(m.recipeId)),`${diet} day ${day}: previous day repeat`);}
+ }
+}
+console.log('✓ Affordable varied menus avoid same-day and previous-day recipe repeats when options permit');
 const weekly={...profile,budgetPeriod:'weekly',foodBudgetPaise:100001};const week=buildMealPlan(weekly);assert.ok(week.reduce((sum,meal)=>sum+meal.costPaise,0)<=weekly.foodBudgetPaise);assert.equal(dailyBudget(weekly),14285);
 const restricted={...profile,allergies:'milk, eggs, peanuts, wheat',foodBudgetPaise:15000};const allergyPlan=buildMealPlan(restricted);assert.equal(allergyPlan.length,28);for(const meal of allergyPlan)assert.equal(meal.ingredients.some(food=>food.allergens.some(allergen=>['milk','eggs','peanuts','gluten'].includes(allergen))),false);
 assert.deepEqual(parseAllergies('milk and eggs').unknown,[]);assert.ok(parseAllergies('dragonfruit allergy').unknown.length);assert.equal(buildMealPlan({...profile,allergies:'dragonfruit allergy'}).length,0);assert.equal(buildMealPlan({...profile,foodBudgetPaise:0}).length,0);

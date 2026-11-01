@@ -1,4 +1,5 @@
 import type { Profile, Meal, BudgetInfo } from "./types";
+import { recipeImage } from "./illustrative-image";
 import { dailyBudget, rupees } from "./types";
 import { recipes, recipeNutrition, compatibleRecipe, parseAllergies, PRICE_NOTE, type Recipe } from "./food-catalog";
 
@@ -29,7 +30,7 @@ export function servingForRecipe(profile: Profile, recipe: Recipe, mealType: str
     userId: profile.id, day, mealType, name: recipe.name,
     description: `${recipe.instructions}${child ? " Caregiver: this is a family recipe reference, not a prescribed child portion. Adapt texture and portions to age, appetite and professional guidance." : ""}`,
     portion: child ? "Family recipe reference · caregiver chooses serving" : "1 recipe serving · ingredient weights before cooking",
-    time: time || mealTimes[slot], image: recipe.image, completed: false,
+    time: time || mealTimes[slot], image: recipeImage(recipe.id), completed: false,
     recipeId: recipe.id, nutritionSource: "ingredient-reference-v1", ...nutrition,
   };
 }
@@ -65,8 +66,10 @@ export function buildMealPlan(profile: Profile, demo = false) {
       let affordable = slots[index].filter(item => item.meal.costPaise + otherCost <= budget);
       const distinct = affordable.filter(item => !selected.some((choice,i) => i !== index && choice.recipe.id === item.recipe.id));
       if (distinct.length) affordable = distinct;
-      const yesterday = result.find(item => item.day === day - 1 && item.mealType === mealTypes[index])?.recipeId;
-      const notYesterday = affordable.filter(item => item.recipe.id !== yesterday);
+      // Prefer a recipe not served anywhere yesterday, not just in the same slot.
+      // Constraints win: relax this preference if no compatible option fits.
+      const yesterday = new Set(result.filter(item => item.day === day - 1).map(item => item.recipeId));
+      const notYesterday = affordable.filter(item => !yesterday.has(item.recipe.id));
       if (notYesterday.length) affordable = notYesterday;
       const score = (item: typeof affordable[number]) => (recipeCounts.get(item.recipe.id) || 0) * 100 + (primaryCounts.get(primary(item.recipe)) || 0) * 3;
       affordable.sort((a,b) => score(a) - score(b) || a.meal.costPaise - b.meal.costPaise || a.recipe.id.localeCompare(b.recipe.id));
