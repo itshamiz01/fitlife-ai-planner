@@ -1,11 +1,15 @@
 "use client";
+import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { LayoutDashboard, UserRound, Utensils, Dumbbell, Droplets, ChartNoAxesCombined, Settings2, ChevronDown, Bell, Menu, X, LogOut, ArrowUpRight, CircleHelp, Check, AlertCircle, ChevronRight, CalendarDays, Leaf, ShieldCheck, Sparkles, MessageCircle, CheckCircle2, WifiOff } from "lucide-react";
+import { LayoutDashboard, UserRound, Utensils, Dumbbell, Droplets, ChartNoAxesCombined, Settings2, ChevronDown, Bell, Menu, X, LogOut, ArrowUpRight, CircleHelp, Check, AlertCircle, ChevronRight, CalendarDays, Leaf, ShieldCheck, Sparkles, MessageCircle, CheckCircle2, WifiOff, Footprints, Moon, BookOpen, Ruler } from "lucide-react";
 import { WellnestContext, type AppModal } from "./app-context";
 import { Brand, Button, PlantIllustration } from "./ui";
 import { DashboardView, MealsView, WorkoutsView, WaterView, ProgressView, ProfileView, SettingsView } from "./views";
 import Dialogs from "./dialogs";
 import CoachView from "./coach-view";
+import ActivityView from "./activity-view";
+import SleepView from "./sleep-view";
+import JournalView from "./journal-view";
 import InstallAppLink from "./install-app-link";
 import type { DashboardData, View, Resource } from "@/lib/types";
 import { todayIndex, todayKey } from "@/lib/types";
@@ -17,11 +21,16 @@ const navItems = [
   { id: "profile" as View, label: "My health profile", icon: UserRound },
   { id: "meals" as View, label: "Meal planner", icon: Utensils },
   { id: "workouts" as View, label: "My workouts", icon: Dumbbell },
+  { id: "food-diary" as View, label: "Food diary", icon: BookOpen },
+  { id: "exercise-journal" as View, label: "Exercise journal", icon: Dumbbell },
+  { id: "measurements" as View, label: "Measurements", icon: Ruler },
+  { id: "activity" as View, label: "Activity journal", icon: Footprints },
+  { id: "sleep" as View, label: "Sleep journal", icon: Moon },
   { id: "water" as View, label: "Water tracker", icon: Droplets },
   { id: "progress" as View, label: "My progress", icon: ChartNoAxesCombined },
   { id: "coach" as View, label: "Nivra coach", icon: Sparkles },
 ];
-const titles: Record<View, string> = { dashboard: "Overview", profile: "My health profile", meals: "Meal planner", workouts: "My workouts", water: "Water tracker", progress: "My progress", settings: "Settings & preferences", coach: "Nivra coach" };
+const titles: Record<View, string> = { dashboard: "Overview", profile: "My health profile", meals: "Meal planner", workouts: "My workouts", water: "Water tracker", progress: "My progress", settings: "Settings & preferences", coach: "Nivra coach", activity: "Activity journal", sleep: "Sleep journal", "food-diary": "Food diary", "exercise-journal": "Exercise journal", measurements: "Measurements" };
 
 async function requestJson<T = DashboardData>(url: string, options?: RequestInit): Promise<T> {
   return authJson<T>(url, options);
@@ -44,7 +53,7 @@ export default function WellnestApp() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [reminderVisible, setReminderVisible] = useState(false);
-  const [nextReminder, setNextReminder] = useState(Date.now() + 3600000);
+  const [nextReminder, setNextReminder] = useState(0);
   const [notificationPermission, setNotificationPermission] = useState("default");
   const started = useRef(false);
   const accountRef = useRef<HTMLDivElement>(null);
@@ -63,6 +72,7 @@ export default function WellnestApp() {
       const session = await authJson<{ user: Profile | null }>("/api/auth");
       if (session.user?.id !== result.user.id) throw new AuthRequestError("Your browser is blocking this preview’s session cookie. Open Fit Life Bro in a new tab to keep your demo and account progress.", "SESSION_COOKIE_BLOCKED");
       setData(result); setNextReminder(Date.now() + result.user.reminderInterval * 60000);
+      if ("Notification" in window) setNotificationPermission(Notification.permission);
     } catch (error) {
       if (error instanceof AuthRequestError && error.code === "SESSION_EXPIRED") { window.location.replace("/login?reason=expired"); return; }
       setLoadError(error instanceof Error ? error.message : "We couldn't load your workspace.");
@@ -72,7 +82,7 @@ export default function WellnestApp() {
   useEffect(() => {
     function readView() { const param = new URLSearchParams(window.location.search).get("view"); if (param && Object.keys(titles).includes(param)) setView(param as View); else setView("dashboard"); }
     readView(); window.addEventListener("popstate", readView);
-    if ("Notification" in window) setNotificationPermission(Notification.permission);
+
     return () => { window.removeEventListener("popstate", readView); if (toastTimer.current) clearTimeout(toastTimer.current); };
   }, []);
   useEffect(() => {
@@ -84,9 +94,9 @@ export default function WellnestApp() {
     return () => document.removeEventListener("mousedown", outside);
   }, []);
   useEffect(() => {
-    if (!data || data.user.isDemo) return;
+    const accountId = data?.user.id;
+    if (!accountId || data?.user.isDemo) return;
     let active = true;
-    const accountId = data.user.id;
     async function checkSession() {
       try { const session = await authJson<{ user: Profile | null }>("/api/auth"); if (active && session.user?.id !== accountId) { window.location.replace("/login?reason=expired"); return; }
         if (active && !busy.current && !modal && view !== "profile" && view !== "settings" && document.visibilityState === "visible") {
@@ -157,7 +167,7 @@ export default function WellnestApp() {
     try {
       const result = await requestJson("/api/profile", { method: "PATCH", body: JSON.stringify(values) }); if (epoch !== accountEpoch.current) return false; setData(result);
       setNextReminder(Date.now() + result.user.reminderInterval * 60000);
-      notify(values.name ? (result.meals.length ? "Profile saved. Your budget-aware weekly plan is ready!" : "Profile saved. Review the meal planner’s budget or restriction guidance.") : "Your preferences are saved.");
+      notify(values.name ? (result.meals.length ? "Profile saved. Review your weekly plan." : "Profile saved. Review the meal planner’s budget or restriction guidance.") : "Your preferences are saved.");
       return true;
     } catch (error) { if (epoch !== accountEpoch.current) return false; setData(previous); if (error instanceof AuthRequestError && error.code === "SESSION_EXPIRED") openModal({ type: "auth", mode: "sign-in" }); notify(error instanceof Error ? error.message : "We couldn't update your profile.", "error"); return false; }
     finally { busy.current = false; setSaving(false); }
@@ -192,11 +202,11 @@ export default function WellnestApp() {
   }
 
   const initials = data?.user.name.split(" ").map(part => part[0]).slice(0, 2).join("") || "A";
-  const currentView = view === "dashboard" ? <DashboardView /> : view === "profile" ? <ProfileView /> : view === "meals" ? <MealsView /> : view === "workouts" ? <WorkoutsView /> : view === "water" ? <WaterView /> : view === "progress" ? <ProgressView /> : view === "coach" ? <CoachView /> : <SettingsView />;
+  const currentView = view === "dashboard" ? <DashboardView /> : view === "profile" ? <ProfileView /> : view === "meals" ? <MealsView /> : view === "workouts" ? <WorkoutsView /> : view === "water" ? <WaterView /> : view === "progress" ? <ProgressView /> : view === "coach" ? <CoachView /> : view === "activity" ? <ActivityView /> : view === "sleep" ? <SleepView /> : view === "food-diary" ? <JournalView kind="food" /> : view === "exercise-journal" ? <JournalView kind="exercise" /> : view === "measurements" ? <JournalView kind="measurement" /> : <SettingsView />;
   const shell = <div className="app-shell">
     {mobileOpen && <button className="sidebar-overlay" onClick={() => setMobileOpen(false)} aria-label="Close navigation" />}
     <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
-      <a href="/" className="brand-link" onClick={event => { event.preventDefault(); navigate("dashboard"); }} aria-label="Fit Life Bro home"><Brand /></a>
+      <Link href="/" className="brand-link" onClick={event => { event.preventDefault(); navigate("dashboard"); }} aria-label="Fit Life Bro home"><Brand /></Link>
       <button className="mobile-close icon-button" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X size={20} /></button>
       <div className="sidebar-label">YOUR WELLNESS SPACE</div>
       <nav className="main-nav" aria-label="Main navigation">{navItems.map(item => <a key={item.id} href={item.id === "dashboard" ? "/" : `/?view=${item.id}`} onClick={event => { event.preventDefault(); navigate(item.id); }} className={`nav-link ${view === item.id ? "active" : ""}`} aria-current={view === item.id ? "page" : undefined}><item.icon size={18} strokeWidth={1.7} /><span>{item.label}</span>{view === item.id && <span className="nav-active-dot" />}</a>)}</nav>
@@ -205,7 +215,7 @@ export default function WellnestApp() {
       <button className="sidebar-account" onClick={() => data?.user.isDemo ? openModal({ type: "auth", mode: "sign-up" }) : navigate("profile")}><span className="avatar">{initials}</span><span><strong>{data?.user.name || "Your wellness space"}</strong><small>{data?.user.isDemo ? "Your personal demo" : "Personal account"}</small></span><ChevronRight size={15} /></button></div>
     </aside>
     <div className="workspace"><header className="topbar"><div className="topbar-left"><button className="icon-button mobile-menu" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={21} /></button><span className="breadcrumb-root">My workspace</span><ChevronRight size={13} className="breadcrumb-chevron" /><span className="breadcrumb-current">{titles[view]}</span></div><div className="topbar-actions">{data && <span className={`account-sync-state ${!online ? "is-offline" : ""}`} title={`Last server read: ${new Date(data.syncedAt).toLocaleString()}. Registered accounts refresh on focus and about every 30 seconds. Offline writes are not queued.`}>{!online ? <WifiOff size={12} /> : <CheckCircle2 size={12} />}{!online ? "Offline · connection needed" : saving ? "Saving to server…" : "Saved to account"}</span>}{data?.user.isDemo && <button className="demo-pill" onClick={() => openModal({ type: "auth", mode: "sign-up" })}><span />Demo workspace <ArrowUpRight size={12} /></button>}{data?.user.isDemo && <button className="topbar-sign-in" onClick={() => openModal({ type: "auth", mode: "sign-in" })}>Sign in<ArrowUpRight size={13} /></button>}<div className="notification-container" ref={notificationRef}><button className={`icon-button notification-button ${notificationsOpen ? "selected" : ""}`} onClick={() => { setNotificationsOpen(!notificationsOpen); setAccountOpen(false); }} aria-label="View notifications" aria-expanded={notificationsOpen}><Bell size={19} strokeWidth={1.7} /><span className="notification-dot" /></button>{notificationsOpen && <div className="notification-popover"><div className="popover-heading"><strong>A little encouragement</strong><span className="badge badge-green">For you</span></div><div className="notification-item"><span className="notification-icon"><Leaf size={17} /></span><div><strong>Your week is looking good</strong><p>Your personalized meals and movement are ready. One small step at a time.</p><button onClick={() => navigate("meals")}>Explore your plan <ArrowUpRight size={12} /></button></div></div><div className="notification-item"><span className="notification-icon blue"><Droplets size={17} /></span><div><strong>Make hydration a happy habit</strong><p>{data?.user.remindersEnabled ? `Your gentle water reminder is set for every ${data.user.reminderInterval} minutes.` : "Turn on gentle reminders and make space for a water break."}</p><button onClick={() => navigate("water")}>Visit water tracker <ArrowUpRight size={12} /></button></div></div><div className="popover-foot"><ShieldCheck size={13} />Your health data stays in your account.</div></div>}</div><span className="topbar-divider" /><div className="account-container" ref={accountRef}><button className="topbar-account" onClick={() => { setAccountOpen(!accountOpen); setNotificationsOpen(false); }} aria-expanded={accountOpen}><span className="avatar avatar-small">{initials}</span><span>{data?.user.name.split(" ")[0] || "Welcome"}</span><ChevronDown size={13} /></button>{accountOpen && <div className="account-popover"><strong>{data?.user.name}</strong><small>{data?.user.email || "Exploring your personal demo"}</small><button onClick={() => navigate("profile")}><UserRound size={15} />My health profile</button><button onClick={() => navigate("settings")}><Settings2 size={15} />Preferences</button>{data?.user.isDemo ? <><button onClick={() => openModal({ type: "auth", mode: "sign-up" })}><Leaf size={15} />Create an account</button><button onClick={() => openModal({ type: "auth", mode: "sign-in" })}><ArrowUpRight size={15} />Sign in</button></> : <button onClick={() => void signOut()}><LogOut size={15} />Sign out</button>}</div>}</div></div></header>
-      <main className="main-content" id="main-content">{data ? <div className="view-enter" key={`${data.user.id}:${accountRevision}:${view}`}>{currentView}</div> : loadError ? <div className="load-error"><AlertCircle size={32} /><h1>A small pause in your journey</h1><p>{loadError}</p><div className="load-error-actions"><Button onClick={() => void load()}>Try again</Button><a className="btn btn-secondary" href="/login">Go to sign in</a><a className="btn btn-secondary" href="/" target="_blank" rel="noopener noreferrer">Open in a new tab<ArrowUpRight size={14} /></a></div></div> : <DashboardSkeleton />}<footer className="page-footer"><span><Leaf size={12} />Made for your health. At your pace.</span><button onClick={() => openModal({ type: "help" })}>General wellness guidance, not medical advice <ArrowUpRight size={11} /></button></footer></main>
+      <main className="main-content" id="main-content">{data ? <div className="view-enter" key={`${data.user.id}:${accountRevision}:${view}`}>{currentView}</div> : loadError ? <div className="load-error"><AlertCircle size={32} /><h1>A small pause in your journey</h1><p>{loadError}</p><div className="load-error-actions"><Button onClick={() => void load()}>Try again</Button><a className="btn btn-secondary" href="/login">Go to sign in</a><Link className="btn btn-secondary" href="/" target="_blank" rel="noopener noreferrer">Open in a new tab<ArrowUpRight size={14} /></Link></div></div> : <DashboardSkeleton />}<footer className="page-footer"><span><Leaf size={12} />Made for your health. At your pace.</span><button onClick={() => openModal({ type: "help" })}>General wellness guidance, not medical advice <ArrowUpRight size={11} /></button></footer></main>
     </div>
     {data && <Dialogs />}
     {data && view !== "coach" && <button className="nivra-launcher" onClick={() => navigate("coach")} aria-label="Ask Nivra, your fitness guide"><span><Sparkles size={20} /></span><span>Ask Nivra</span><MessageCircle size={15} /></button>}

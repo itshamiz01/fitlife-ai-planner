@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { users, meals, workouts, weightLogs } from "@/db/schema";
+import { users, weightLogs } from "@/db/schema";
 import { ApiError, apiError, requireUser, checkOrigin, text, number, choice, publicProfile, getDashboardData } from "@/lib/server";
-import { recommendations, buildMealPlan, buildWorkoutPlan } from "@/lib/planner";
+import { recommendations } from "@/lib/planner";
+import { archiveAndReplacePlan } from "@/lib/plan-archive";
+import { profileChangesPlan } from "@/lib/profile-plan-change";
 export async function PATCH(request: Request) {
   try {
     checkOrigin(request);
@@ -36,16 +38,17 @@ export async function PATCH(request: Request) {
         workoutMinutes: Math.round(number(body.workoutMinutes ?? user.workoutMinutes, "Session duration", 10, 90)),
         fitnessGoal: choice(body.fitnessGoal ?? user.fitnessGoal, ["general-fitness", "muscle-gain", "fat-loss", "strength"], "training focus"),
       };
-      const targets = { ...recommendations(values), ...(body.waterTarget === undefined ? {} : { waterTarget: Math.round(number(body.waterTarget, "Daily water guide", 500, 4000)) }) };
+      const waterOverride = body.waterTarget === undefined ? {} : { waterTarget: Math.round(number(body.waterTarget, "Daily water guide", 500, 4000)) };
       await db.transaction(async tx => {
-        const resetBaseline = values.goal !== user.goal || values.targetWeight !== user.targetWeight || values.currentWeight !== user.currentWeight;
-        const [updated] = await tx.update(users).set({ ...values, ...targets, startWeight: resetBaseline ? values.currentWeight : user.startWeight }).where(eq(users.id, user.id)).returning();
-        if (values.currentWeight !== user.currentWeight) await tx.insert(weightLogs).values({ userId: user.id, weight: values.currentWeight, date: new Date().toISOString().slice(0, 10), note: "A fresh profile check-in" });
-        await tx.delete(meals).where(eq(meals.userId, user.id));
-        await tx.delete(workouts).where(eq(workouts.userId, user.id));
-        const plan = buildMealPlan(publicProfile(updated));
-        if (plan.length) await tx.insert(meals).values(plan);
-        await tx.insert(workouts).values(buildWorkoutPlan(publicProfile(updated)));
+        const [fresh] = await tx.select().from(users).where(eq(users.id, user.id)).for("update");
+        const changesPlan = profileChangesPlan(fresh, values);
+        const targets = changesPlan ? { ...recommendations(values), ...waterOverride } : waterOverride;
+        const resetBaseline = values.goal !== fresh.goal || values.targetWeight !== fresh.targetWeight || values.currentWeight !== fresh.currentWeight;
+        const [updated] = await tx.update(users).set({ ...values, ...targets, startWeight: resetBaseline ? values.currentWeight : fresh.startWeight }).where(eq(users.id, user.id)).returning();
+        if (values.currentWeight !== fresh.currentWeight) await tx.insert(weightLogs).values({ userId: user.id, weight: values.currentWeight, date: new Date().toISOString().slice(0, 10), note: "A fresh profile check-in" });
+        if (changesPlan) {
+          await archiveAndReplacePlan(tx, publicProfile(fresh), publicProfile(updated), "profile-change");
+        }
       });
     }
     return NextResponse.json(await getDashboardData(user.id), { headers: { "Cache-Control": "private, no-store" } });

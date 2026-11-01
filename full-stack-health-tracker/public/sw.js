@@ -40,3 +40,21 @@ self.addEventListener("fetch", event => {
     return response;
   }));
 });
+
+// Web Push is only available when a subscription and server scheduler are configured.
+self.addEventListener("push", event => {
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; } catch { /* Use a safe generic message. */ }
+  const title = typeof payload.title === "string" ? payload.title.slice(0, 100) : "Time for a water break 💧";
+  const body = typeof payload.body === "string" ? payload.body.slice(0, 200) : "Take a water break if you need one.";
+  event.waitUntil(self.registration.showNotification(title, { body, icon: "/icons/icon-192.png", badge: "/icons/icon-192.png", tag: "fitlife-water-push", data: { url: "/?view=water" } }));
+});
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async clients => {
+    const url = new URL("/?view=water", self.location.origin).href;
+    const existing = clients.find(client => new URL(client.url).origin === self.location.origin);
+    if (existing) { await existing.navigate(url); return existing.focus(); }
+    return self.clients.openWindow(url);
+  }));
+});

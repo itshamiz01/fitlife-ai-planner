@@ -105,3 +105,66 @@ export const coachMessages = pgTable("fitlife_coach_messages", {
   mode: text("mode").notNull().default("local"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Immutable snapshots of replaced plans; retained until the account is deleted.
+export const planArchives = pgTable("fitlife_plan_archives", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  reason: text("reason").notNull(),
+  snapshot: jsonb("snapshot").$type<{ profile: import("@/lib/types").Profile; meals: (typeof meals.$inferSelect)[]; workouts: (typeof workouts.$inferSelect)[] }>().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const activityLogs = pgTable("fitlife_activity_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  date: text("date").notNull(),
+  activity: text("activity").notNull(),
+  steps: integer("steps"),
+  distanceKm: real("distance_km"),
+  durationMinutes: integer("duration_minutes"),
+  note: text("note").notNull().default(""),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const sleepLogs = pgTable("fitlife_sleep_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+  endedAt: timestamp("ended_at", { withTimezone: true }).notNull(),
+  quality: integer("quality"),
+  note: text("note").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const journalEntries = pgTable("fitlife_journal_entries", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  date: text("date").notNull(),
+  title: text("title").notNull(),
+  details: jsonb("details").$type<Record<string, number | null>>().notNull().default({}),
+  note: text("note").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// One bounded shopping-list state per account. A list signature prevents stale marks
+// from being reused after changing the plan, day, preparation state or people count.
+export const groceryPurchases = pgTable("fitlife_grocery_purchases", {
+  userId: uuid("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  listSignature: text("list_signature").notNull(),
+  purchasedKeys: jsonb("purchased_keys").$type<string[]>().notNull().default([]),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Push endpoint and keys are private delivery credentials; never include them in logs or exports.
+export const waterPushSubscriptions = pgTable("fitlife_water_push_subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  timeZone: text("time_zone").notNull(),
+  nextDue: timestamp("next_due", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});

@@ -11,6 +11,8 @@ export type MealIngredient = {
   foodId: string; name: string; grams: number; state: string; costPaise: number;
   unitPricePaisePer100g: number; kcal: number; protein: number; carbs: number; fat: number;
   allergens: string[]; sourceUrl: string;
+  servingBase?: { grams: number; costPaise: number; kcal: number; protein: number; carbs: number; fat: number };
+  servingCount?: number;
 };
 export type Meal = {
   id: string; userId: string; day: number; mealType: string; name: string;
@@ -26,7 +28,7 @@ export type WaterLog = { id: string; userId: string; amount: number; date: strin
 export type WeightLog = { id: string; userId: string; weight: number; date: string; note: string; createdAt: string };
 export type BudgetInfo = { dailyBudgetPaise: number; weeklyBudgetPaise: number; minimumDailyPaise: number | null; warnings: string[]; unknownAllergies: string[]; priceNote: string };
 export type DashboardData = { user: Profile; meals: Meal[]; workouts: Workout[]; waterLogs: WaterLog[]; weightLogs: WeightLog[]; planning: BudgetInfo; syncedAt: string };
-export type View = "dashboard" | "profile" | "meals" | "workouts" | "water" | "progress" | "settings" | "coach";
+export type View = "dashboard" | "profile" | "meals" | "workouts" | "water" | "progress" | "settings" | "coach" | "activity" | "sleep" | "food-diary" | "exercise-journal" | "measurements";
 export type Resource = "meals" | "workouts" | "water" | "weights";
 export type CoachSource = { title: string; url?: string };
 export type CoachMessage = { id: string; role: string; content: string; sources: CoachSource[]; mode: string; createdAt: string };

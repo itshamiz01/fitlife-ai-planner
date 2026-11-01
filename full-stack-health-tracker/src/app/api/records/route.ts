@@ -4,12 +4,14 @@ import { db } from "@/db";
 import { meals, workouts, waterLogs, weightLogs, users } from "@/db/schema";
 import { ApiError, apiError, requireUser, checkOrigin, choice, text, number, validDate, validTime, getDashboardData, publicProfile } from "@/lib/server";
 
-import { recipes, compatibleRecipe } from "@/lib/food-catalog";
-import { servingForRecipe } from "@/lib/planner";
+import { recipes, compatibleRecipe, foodById } from "@/lib/food-catalog";
+import { recipeMatchesMealType, servingForRecipe } from "@/lib/planner";
 import { dailyBudget } from "@/lib/types";
+import { scaleSavedServing, servingSnapshotKey } from "@/lib/recipe-serving";
+import { substituteIngredient, substitutionOptions } from "@/lib/ingredient-substitutions";
 
 function mealValues(body: Record<string, unknown>) {
-  const type = choice(body.mealType, ["Breakfast", "Lunch", "Dinner", "Snack"], "meal type");
+  const type = choice(body.mealType, ["Breakfast", "Lunch", "Dinner", "Snack", "Pre-workout", "Post-workout"], "meal type");
   return { recipeId: null, ingredients: [], nutritionSource: "manual", costPaise: body.cost === undefined || body.cost === null || body.cost === "" ? null : Math.round(number(body.cost, "Meal cost in rupees", 0, 10000) * 100), day: Math.round(number(body.day, "Day", 0, 6)), mealType: type, name: text(body.name, "Meal name", 100), description: text(body.description, "Ingredients", 1500, false), portion: text(body.portion, "Portion", 150), time: validTime(body.time), calories: Math.round(number(body.calories, "Calories", 0, 2500)), protein: Math.round(number(body.protein ?? 20, "Protein", 0, 250)), carbs: Math.round(number(body.carbs ?? 40, "Carbs", 0, 400)), fat: Math.round(number(body.fat ?? 15, "Fat", 0, 250)), image: type === "Breakfast" ? "/images/toast.jpg" : type === "Dinner" ? "/images/salmon.jpg" : type === "Snack" ? "/images/snack.jpg" : "/images/salad.jpg" };
 }
 function workoutValues(body: Record<string, unknown>) {
@@ -34,6 +36,55 @@ async function mutate(request: Request, method: "POST" | "PATCH" | "DELETE") {
       const where = and(eq(meals.id, id), eq(meals.userId, user.id));
       if (method === "POST") { await db.insert(meals).values({ ...mealValues(body), userId: user.id }); changed = true; }
       else if (method === "DELETE") changed = (await db.delete(meals).where(where).returning()).length > 0;
+      else if (body.substitution !== undefined) {
+        const substitution = body.substitution as { index?: unknown; foodId?: unknown } | null;
+        if (!substitution || !Number.isInteger(substitution.index) || (substitution.index as number) < 0 || typeof substitution.foodId !== "string" || typeof body.snapshotKey !== "string" || body.snapshotKey.length > 50000 || typeof body.expectedRecipeId !== "string") throw new ApiError("Invalid substitution.");
+        await db.transaction(async tx => {
+          const [fresh] = await tx.select().from(users).where(eq(users.id, user.id)).for("update");
+          const [old] = await tx.select().from(meals).where(where).for("update");
+          if (!old) throw new ApiError("This meal could not be found.", 404);
+          if (!old.recipeId || old.recipeId !== body.expectedRecipeId || !old.ingredients.length || servingSnapshotKey(old.ingredients) !== body.snapshotKey) throw new ApiError("The meal changed. Reopen it before substituting an ingredient.", 409);
+          const index = substitution.index as number;
+          if (!substitutionOptions(old.ingredients, index).includes(substitution.foodId as string) || old.ingredients.some(item => !foodById[item.foodId])) throw new ApiError("That substitution is not available for this meal.");
+          let scaled;
+          try { scaled = substituteIngredient(old.ingredients, index, substitution.foodId as string); } catch { throw new ApiError("This ingredient snapshot cannot be safely substituted."); }
+          const profile = publicProfile(fresh);
+          const candidate = { id: old.recipeId, name: old.name, types: [old.mealType], ingredients: scaled.ingredients.map(item => [item.foodId, item.grams] as [string, number]), instructions: old.description, image: old.image, tag: "" };
+          if (!compatibleRecipe(candidate, profile)) throw new ApiError("The resulting ingredients do not match your current dietary or allergy settings.");
+          const weeklyOthers = await tx.select().from(meals).where(and(eq(meals.userId, user.id), ne(meals.id, old.id)));
+          if (weeklyOthers.some(item => item.costPaise === null)) throw new ApiError("Other meals have unknown prices, so the budget cannot be confirmed. Add their estimated costs first.");
+          const others = weeklyOthers.filter(item => item.day === old.day);
+          const weeklyBudget = profile.budgetPeriod === "weekly" ? profile.foodBudgetPaise : dailyBudget(profile) * 7;
+          if (weeklyOthers.reduce((sum,item) => sum + (item.costPaise ?? 0), 0) + scaled.costPaise > weeklyBudget) throw new ApiError("That change exceeds your estimated weekly food budget.");
+          if (others.reduce((sum,item) => sum + (item.costPaise ?? 0), 0) + scaled.costPaise > dailyBudget(profile)) throw new ApiError("That substitution exceeds your estimated daily food budget.");
+          const substitutionNotice = "Ingredient substitutions have been made; the original recipe instructions may not match the saved ingredients. Review the ingredient list and adapt preparation.";
+          const description = old.description.includes(substitutionNotice) ? old.description : `${old.description} ${substitutionNotice}`.trim();
+          await tx.update(meals).set({ ingredients: scaled.ingredients, calories: Math.round(scaled.calories), protein: Math.round(scaled.protein), carbs: Math.round(scaled.carbs), fat: Math.round(scaled.fat), costPaise: scaled.costPaise, description, completed: false }).where(where);
+          changed = true;
+        });
+      }
+      else if (body.servings !== undefined) {
+        if (!Number.isInteger(body.servings) || (body.servings as number) < 1 || (body.servings as number) > 4 || typeof body.snapshotKey !== "string" || body.snapshotKey.length > 50000 || typeof body.expectedRecipeId !== "string") throw new ApiError("Choose between 1 and 4 servings.");
+        await db.transaction(async tx => {
+          const [fresh] = await tx.select().from(users).where(eq(users.id, user.id)).for("update");
+          const [old] = await tx.select().from(meals).where(where).for("update");
+          if (!old) throw new ApiError("This meal could not be found.", 404);
+          if (!old.recipeId || old.recipeId !== body.expectedRecipeId || !old.ingredients.length || servingSnapshotKey(old.ingredients) !== body.snapshotKey) throw new ApiError("The meal changed. Reopen it before adjusting servings.", 409);
+          if (old.ingredients.some(item => !foodById[item.foodId])) throw new ApiError("Some saved ingredients are no longer recognized; servings cannot be safely adjusted.");
+          const profile = publicProfile(fresh);
+          const actualIngredients = { id: old.recipeId, name: old.name, types: [old.mealType], ingredients: old.ingredients.map(item => [item.foodId, item.grams] as [string, number]), instructions: old.description, image: old.image, tag: "" };
+          if (!compatibleRecipe(actualIngredients, profile)) throw new ApiError("These ingredients do not match your current dietary or allergy settings.");
+          const scaled = scaleSavedServing(old.ingredients, body.servings as number);
+          const weeklyOthers = await tx.select().from(meals).where(and(eq(meals.userId, user.id), ne(meals.id, old.id)));
+          if (weeklyOthers.some(item => item.costPaise === null)) throw new ApiError("Other meals have unknown prices, so the budget cannot be confirmed. Add their estimated costs first.");
+          const others = weeklyOthers.filter(item => item.day === old.day);
+          const weeklyBudget = profile.budgetPeriod === "weekly" ? profile.foodBudgetPaise : dailyBudget(profile) * 7;
+          if (weeklyOthers.reduce((sum,item) => sum + (item.costPaise ?? 0), 0) + scaled.costPaise > weeklyBudget) throw new ApiError("That change exceeds your estimated weekly food budget.");
+          if (others.reduce((sum,item) => sum + (item.costPaise ?? 0), 0) + scaled.costPaise > dailyBudget(profile)) throw new ApiError("That serving change exceeds your estimated daily food budget.");
+          await tx.update(meals).set({ ingredients: scaled.ingredients, calories: Math.round(scaled.calories), protein: Math.round(scaled.protein), carbs: Math.round(scaled.carbs), fat: Math.round(scaled.fat), costPaise: scaled.costPaise, portion: `${body.servings} saved recipe ${body.servings === 1 ? "serving" : "servings"} · ingredient weights before cooking`, completed: false }).where(where);
+          changed = true;
+        });
+      }
       else if (typeof body.recipeId === "string") {
         await db.transaction(async tx => {
           const [fresh] = await tx.select().from(users).where(eq(users.id, user.id)).for("update");
@@ -41,7 +92,7 @@ async function mutate(request: Request, method: "POST" | "PATCH" | "DELETE") {
           if (!old) throw new ApiError("This meal could not be found.", 404);
           const recipe = recipes.find(item => item.id === body.recipeId);
           const profile = publicProfile(fresh);
-          if (!recipe || !recipe.types.includes(old.mealType) || !compatibleRecipe(recipe, profile)) throw new ApiError("This recipe doesn't match your dietary or allergy settings.");
+          if (!recipe || !recipeMatchesMealType(recipe, old.mealType) || !compatibleRecipe(recipe, profile)) throw new ApiError("This recipe doesn't match your dietary or allergy settings.");
           const replacement = servingForRecipe(profile, recipe, old.mealType, old.day, old.time);
           const others = await tx.select().from(meals).where(and(eq(meals.userId, user.id), eq(meals.day, old.day), ne(meals.id, old.id)));
           const cost = others.reduce((sum,item) => sum + (item.costPaise ?? 0), 0) + replacement.costPaise;

@@ -3,7 +3,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const ts=require('typescript');
 const cache=new Map();
-function source(name){const file=path.resolve(name);if(cache.has(file))return cache.get(file).exports;const module={exports:{}};cache.set(file,module);const compiled=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,esModuleInterop:true}}).outputText;const localRequire=value=>value.startsWith('.')?source(path.resolve(path.dirname(file),value)+'.ts'):require(value);new Function('require','module','exports',compiled)(localRequire,module,module.exports);return module.exports;}
+function source(name){const file=path.resolve(name);if(cache.has(file))return cache.get(file).exports;const loaded={exports:{}};cache.set(file,loaded);const compiled=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,esModuleInterop:true}}).outputText;const localRequire=value=>value.startsWith('.')?source(path.resolve(path.dirname(file),value)+'.ts'):require(value);new Function('require','module','exports',compiled)(localRequire,loaded,loaded.exports);return loaded.exports;}
 const {buildMealPlan,getBudgetInfo,buildWorkoutPlan}=source('src/lib/planner.ts');
 const {foods,foodById,parseAllergies}=source('src/lib/food-catalog.ts');
 const {answerFromRecords}=source('src/lib/coach-engine.ts');

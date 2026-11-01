@@ -1,3 +1,4 @@
+import { expandedFoods, expandedRecipes } from "./recipe-expansion";
 import type { Profile, MealIngredient } from "./types";
 
 export const FOOD_REFERENCE = "https://www.fitcalcs.app/charts/macros-by-food";
@@ -11,7 +12,7 @@ const f = (id: string, name: string, state: string, kcal: number, protein: numbe
 export const foods: Food[] = [
   f("rice", "White rice", "dry, before cooking", 365, 7.1, 80, .7, 650),
   f("lentils", "Lentils / dal", "dry, before cooking", 352, 24.6, 63.4, 1.1, 1200, [], "plant", ["dal", "lentil", "moong", "masoor"]),
-  f("chana", "Chickpeas / chana", "dry, before soaking and cooking", 378, 20.5, 63, 6, 1000, [], "plant", ["chickpea", "chickpeas", "bengal gram", "chana"]),
+  f("chana", "Chickpeas / chana", "dry, before soaking and cooking", 378, 20.5, 63, 6, 1000, ["chana"], "plant", ["chickpea", "chickpeas", "bengal gram", "chana"]),
   f("atta", "Whole-wheat atta", "dry flour", 340, 13.2, 72, 2.5, 500, ["gluten"], "plant", ["wheat", "roti", "chapati", "flour"], "https://www.nutritionvalue.org/Wheat_flour%2C_whole-grain_nutritional_value.html"),
   f("oats", "Rolled oats", "dry", 379, 13.2, 67.7, 6.5, 1600, ["gluten"], "plant", ["oat", "oatmeal"]),
   f("potato", "Potato", "raw edible portion", 77, 2, 17.5, .1, 300, [], "plant", ["potatoes", "aloo"]),
@@ -26,10 +27,22 @@ export const foods: Food[] = [
   f("egg", "Whole egg", "raw edible weight without shell; cook fully", 143, 12.6, .7, 9.5, 1400, ["eggs"], "egg", ["eggs"], "https://fdc.nal.usda.gov/fdc-app.html#/food-details/171287/nutrients"),
   f("chicken", "Skinless chicken breast", "raw edible portion; cook fully", 120, 22.5, 0, 2.6, 2800, [], "meat", ["poultry"]),
   f("oil", "Sunflower oil", "as sold; grams", 884, 0, 0, 100, 2000, [], "plant", ["sunflower"], USDA_REFERENCE),
+  ...expandedFoods,
 ];
 export const foodById: Record<string, Food> = Object.fromEntries(foods.map(food => [food.id, food]));
-export type Recipe = { id: string; name: string; types: string[]; ingredients: [string, number][]; instructions: string; image: string; tag: string };
-const r = (id: string, name: string, types: string[], ingredients: Recipe["ingredients"], instructions: string, image: string, tag = "Everyday ingredients"): Recipe => ({ id, name, types, ingredients, instructions, image, tag });
+export type Recipe = { id: string; name: string; types: string[]; ingredients: [string, number][]; instructions: string; image: string; tag: string; details?: { description: string; preparationMinutes: number | null; cookingMinutes: number | null; servings: number; categories: string[]; steps: string[]; equipment: string; storage: string; seasoning: string } };
+// Preserve the original instructions verbatim while presenting their sentences as steps.
+// Historical cooking times were not recorded; do not fabricate them.
+const r = (id: string, name: string, types: string[], ingredients: Recipe["ingredients"], instructions: string, image: string, tag = "Everyday ingredients"): Recipe => ({
+  id, name, types, ingredients, instructions, image, tag,
+  details: {
+    description: `Original catalog recipe: ${name}.`, preparationMinutes: null, cookingMinutes: null, servings: 1,
+    categories: [], steps: instructions.match(/[^.!?]+(?:[.!?]+|$)/g)?.map(step => step.trim()).filter(Boolean) || [instructions],
+    equipment: "Basic cooking utensils; exact equipment was not recorded.",
+    storage: "Refrigerate leftovers promptly and reheat thoroughly; follow applicable food-safety guidance.",
+    seasoning: "Check all ingredients, labels and cross-contact. Water and any unlisted seasonings are not included in estimates.",
+  },
+});
 export const recipes: Recipe[] = [
   r("rice-dal-breakfast", "Soft rice & dal breakfast", ["Breakfast"], [["rice",60],["lentils",40],["carrot",70],["oil",5]], "Rinse rice and dal, then simmer with carrot and enough water until completely soft. Add the measured oil. Grain and pulse weights are dry before cooking; check labels and cross-contact if avoiding gluten.", "/images/dal-rice.jpg", "Simple pantry staples"),
   r("dal-chilla", "Dal chilla & seasonal sabzi", ["Breakfast"], [["lentils",65],["atta",30],["carrot",70],["oil",5]], "Soak the lentils, blend with water and flour, and cook small chillas thoroughly. Lightly sauté the carrot with the measured oil. Water and a pinch of salt are not costed.", "/images/roti-dal.jpg", "Protein from pulses"),
@@ -49,11 +62,12 @@ export const recipes: Recipe[] = [
   r("chana-papaya", "Chana & seasonal papaya", ["Snack"], [["chana",40],["papaya",150]], "Soak and thoroughly boil chickpeas, then serve alongside peeled papaya. Choose ripe, locally available fruit.", "/images/chana.jpg", "Seasonal fruit"),
   r("milk-banana", "Milk & banana break", ["Snack"], [["milk",200],["banana",100]], "Serve banana with pasteurized milk. This contains dairy and is not suitable for a milk allergy.", "/images/banana-oats.jpg"),
   r("egg-banana", "Boiled eggs & banana", ["Snack"], [["egg",100],["banana",100]], "Boil eggs until fully cooked. Serve with peeled banana. Two large eggs are roughly 100 g raw edible egg before cooking.", "/images/banana-oats.jpg", "Eggetarian option"),
+  ...expandedRecipes,
 ];
 const allergyAliases: Record<string, string[]> = {
   milk: ["milk", "dairy", "lactose"], eggs: ["egg", "eggs"], gluten: ["gluten", "wheat", "celiac", "coeliac"],
   peanuts: ["peanut", "peanuts", "groundnut", "groundnuts"], "tree-nuts": ["tree nuts", "almond", "almonds", "cashew", "cashews", "walnut", "walnuts"],
-  soy: ["soy", "soya"], sesame: ["sesame", "til"], fish: ["fish"], shellfish: ["shellfish", "shell fish", "shrimp", "prawn", "prawns"],
+  chana: ["kala chana", "chickpea flour", "gram flour", "bengal gram", "chickpeas", "chickpea", "chana", "besan"], soy: ["soy", "soya"], mustard: ["mustard", "rai"], sesame: ["sesame", "til"], fish: ["fish"], shellfish: ["shellfish", "shell fish", "shrimp", "prawn", "prawns"],
 };
 export function parseAllergies(input: string) {
   const raw = input.toLowerCase().trim();
