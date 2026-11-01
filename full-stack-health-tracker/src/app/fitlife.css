@@ -18,3 +18,45 @@
 .recipe-library-hero{position:relative;overflow:hidden;border-radius:18px;min-height:240px;background:#e8efe4;display:flex;align-items:center;margin-bottom:20px}
 .recipe-library-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42}.recipe-library-hero>div{position:relative;padding:28px;max-width:460px;background:linear-gradient(90deg,#edf4eafa,#edf4ead9,transparent)}.recipe-library-hero h2{font-size:28px;color:#365832;margin:10px 0}.recipe-library-hero p{line-height:1.6;color:#506b50}.recipe-library-hero span{font-size:11px;letter-spacing:1px;color:#557752}
 .recipe-library-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}.recipe-library-filters label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#496647}.recipe-library-filters input,.recipe-library-filters select,.recipe-guide select{width:100%;border:1px solid #d8e5d5;background:white;border-radius:8px;padding:9px;color:#314c35}.recipe-library-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:18px 0}.recipe-library-card{text-align:left;background:white;border:1px solid #e0e9dc;border-radius:14px;overflow:hidden;cursor:pointer}.recipe-library-card:hover,.recipe-library-card:focus-visible{outline:2px solid #6b986d;outline-offset:2px}.recipe-library-card img{width:100%;height:150px;object-fit:cover}.recipe-library-copy{display:flex;flex-direction:column;gap:8px;padding:14px;color:#38583b}.recipe-library-copy small{line-height:1.4;color:#738971}.recipe-guide{display:flex;flex-direction:column;gap:12px;line-height:1.6}.recipe-guide ol{list-style:decimal;padding-left:24px}.recipe-guide li{padding:3px 0}.recipe-guide h3{font-size:15px;color:#38583b;font-weight:600}.recipe-guide table{width:100%}
+
+/* Botanical glass surfaces: the contrast layer stays opaque enough for readable text. */
+body { background: #f3f1e9 url('/images/glass-leaves.svg') center top / cover fixed no-repeat; }
+.workspace { background: transparent; }
+.sidebar, .topbar { background: rgba(253, 254, 251, .92); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.panel, .stat-card, .meal-card, .workout-card { background-color: rgba(255, 255, 252, .88); border-color: rgba(220, 229, 217, .95); box-shadow: 0 8px 28px rgba(44, 65, 45, .06); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+/* Preserve the intentionally blue water panel and dark goal card. */
+.water-hero { background-color: rgba(239, 248, 252, .91); }
+.brand-wordmark strong { font-family: "Brush Script MT", "Segoe Script", cursive; font-style: italic; font-weight: 600; letter-spacing: -.7px; color: #739064; }
+.topbar-brand { display: none; }
+@media (max-width: 900px) {
+  .topbar { position: relative; min-height: 76px; }
+  .topbar-left, .topbar-actions { position: relative; z-index: 1; }
+  .topbar-left .breadcrumb-current { display: none; }
+  .topbar-brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #2b4730; white-space: nowrap; font-size: 18px; line-height: 1; font-weight: 750; letter-spacing: -.7px; }
+  .topbar-brand .brand-wordmark { font-size: 17px; }
+  .topbar-brand small { color: #758471; font-size: 10px; font-weight: 500; letter-spacing: 0; }
+}
+@media (max-width: 520px) {
+  .topbar { padding-left: 16px; padding-right: 16px; }
+  .topbar-brand { font-size: 17px; }
+  .topbar-actions { gap: 9px; }
+  .topbar-actions .demo-pill { display: none; }
+  .topbar-sign-in { font-size: 9px; }
+}
+@media (max-width: 360px) {
+  .topbar-brand .brand-wordmark { font-size: 15px; }
+  .topbar-actions { gap: 4px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .sidebar, .topbar, .panel, .stat-card, .meal-card, .workout-card { backdrop-filter: none; -webkit-backdrop-filter: none; background-color: #fff; }
+  .water-hero { background-color: #f4f9fc; }
+}
+@media (max-width: 520px) {
+  /* Keep demo sign-in reachable on narrow screens without covering the centered brand. */
+  .topbar:has(.topbar-sign-in) { height: 104px; align-items: flex-start; padding-top: 19px; }
+  .topbar:has(.topbar-sign-in) .topbar-brand { top: 33px; }
+  .topbar-actions:has(.topbar-sign-in) .topbar-sign-in { position: absolute; top: 43px; right: 0; }
+}
+@media (max-width: 900px) {
+  .topbar-actions .demo-pill, .topbar-account > span:nth-child(2), .topbar-account > svg { display: none; }
+}
