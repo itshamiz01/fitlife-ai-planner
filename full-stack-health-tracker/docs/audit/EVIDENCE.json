@@ -1,0 +1,1489 @@
+{
+  "audit": {
+    "phase": 1,
+    "createdAt": "2026-10-30T22:15:43.499Z",
+    "applicationCodeChanges": false,
+    "schemaChanges": false,
+    "dependencyUpgrades": false,
+    "githubChanges": false,
+    "paidAiRequests": false,
+    "physicalAndroidTested": false,
+    "scope": "Audit and proposed plan only. Not a 2.0 implementation or release certification."
+  },
+  "remoteRepository": {
+    "url": "https://github.com/itshamiz01/fitlife-ai-planner",
+    "observedMainReference": "de6bb028c0a05a2dc13726d25c9729ade3131ef4",
+    "observedTreeReference": "de6bb028c0a05a2dc13726d25c9729ade3131ef4",
+    "snapshotFiles": [
+      {
+        "path": ".github/workflows/cloudflare-pages.yml",
+        "bytes": 745,
+        "sha256": "3f149bff230794ac069ac6c04fd1bf5148cc3a6e35f70a4ca16c3111b55b66cd"
+      },
+      {
+        "path": ".github/workflows/deploy.yml",
+        "bytes": 999,
+        "sha256": "fad128e0b4ea84df939c5d7f05e7abcaca875da70071fc4ac46b101e34bc0fba"
+      },
+      {
+        "path": "README.md",
+        "bytes": 536,
+        "sha256": "6bd9316decbca80b6dbc15aa9076e1e7a018a73acae689d7027c39faf2fa6faf"
+      },
+      {
+        "path": "functions/api/coach.js",
+        "bytes": 6073,
+        "sha256": "c2719bdb69c99066733dab60983b3f45516e7932e2ac9fd34976d350365b1896"
+      },
+      {
+        "path": "index.html",
+        "bytes": 834,
+        "sha256": "b13fa0cdb5a88498cd0745b623eeb04bf2f56155b79357cd66c0f9dacda36453"
+      },
+      {
+        "path": "package.json",
+        "bytes": 439,
+        "sha256": "c96ed76e583155e7aa20344f04dbed8573e696de6a1fe217a4f7029c8360f1d0"
+      },
+      {
+        "path": "postcss.config.js",
+        "bytes": 67,
+        "sha256": "08910ce1d5cd87d2167e9c78b77262bf985b3f07dc5037ff745ecd6a759fd0c0"
+      },
+      {
+        "path": "public/fitlife-icon.svg",
+        "bytes": 376,
+        "sha256": "538af2aa8bf97b4852ceca6860a81f50660c00a0f84d2249f18e6458087379d6"
+      },
+      {
+        "path": "public/manifest.webmanifest",
+        "bytes": 559,
+        "sha256": "03585544fad3192cfeff4e96beb0ead30ea7b5d320e6d1a7bf4f720e636d3103"
+      },
+      {
+        "path": "public/sw.js",
+        "bytes": 1836,
+        "sha256": "75f1f631d77ba74f5f798c3cd76f6bbadc0593f8fb182cb4202fbf0e651e51bb"
+      },
+      {
+        "path": "src/App.jsx",
+        "bytes": 117856,
+        "sha256": "03583607ba22bfc68edc2b980c149f80ee7e1a42f4b2323b73cdb88dfec2c84d"
+      },
+      {
+        "path": "src/index.css",
+        "bytes": 149,
+        "sha256": "847e83a4b1770334379a05c4b1918bfa382df1548c77833680c137f9f900fee8"
+      },
+      {
+        "path": "src/main.jsx",
+        "bytes": 651,
+        "sha256": "0fef941249b5ad8d38e730b46d246b6d6d71d260ccc1f1341bed997354a7e232"
+      },
+      {
+        "path": "tailwind.config.js",
+        "bytes": 112,
+        "sha256": "3ec959ad6606bbf9af9fb120ef0620a692d354fe4dccb1aa5d5392aed94d7059"
+      },
+      {
+        "path": "vite.config.js",
+        "bytes": 302,
+        "sha256": "a374a40f52d60b7fa3f37e3c93f501192623e860159139fa475b263481dc8b95"
+      }
+    ],
+    "gitBlobVerification": {
+      "checked": 15,
+      "mismatches": []
+    },
+    "architecture": "React/Vite/Tailwind 3 client; Cloudflare coach function; not the local Next.js/PostgreSQL workspace",
+    "templateLibraries": {
+      "vegetarianDays": 7,
+      "nonVegetarianDays": 1,
+      "veganLibrary": false,
+      "eggetarianLibrary": false,
+      "unknownDietFallback": "vegetarian"
+    },
+    "deployment": {
+      "githubPagesFrontendStatus": 200,
+      "githubPagesCoachGetStatus": 404,
+      "latestObservedGithubPagesRun": "https://github.com/itshamiz01/fitlife-ai-planner/actions/runs/38684687006",
+      "cloudflareWorkflowVisibleRunCount": 0,
+      "cloudflareProductionAndSecrets": "unverified"
+    },
+    "provider": {
+      "source": "OpenRouter",
+      "defaultModel": "openai/gpt-4o-mini",
+      "secretName": "OPENROUTER_API_KEY",
+      "frontendStaleLabel": "gemini-3-flash",
+      "frontendStaleErrorSecretName": "GEMINI_API_KEY",
+      "liveCompletionTested": false
+    }
+  },
+  "workspace": {
+    "architecture": "Next.js App Router / React / Tailwind 4 / Lucide / PostgreSQL / Drizzle / PWA",
+    "configuredVariableNames": [
+      "DATABASE_URL"
+    ],
+    "gitCheckoutOrRemoteObserved": false,
+    "sourceFingerprintCount": 83,
+    "sourceInventory": {
+      "textFileCount": 58,
+      "lineCount": 2879,
+      "references": {
+        "sensor": [],
+        "localStorage": [],
+        "gemini": [],
+        "apiCalls": [
+          {
+            "file": "src/lib/auth-client.ts",
+            "line": 10
+          },
+          {
+            "file": "src/lib/coach-provider.ts",
+            "line": 10
+          },
+          {
+            "file": "scripts/verify-auth.cjs",
+            "line": 206
+          },
+          {
+            "file": "scripts/verify-auth.cjs",
+            "line": 210
+          },
+          {
+            "file": "scripts/verify-auth.cjs",
+            "line": 213
+          },
+          {
+            "file": "scripts/verify-install.cjs",
+            "line": 59
+          },
+          {
+            "file": "scripts/verify-install.cjs",
+            "line": 62
+          },
+          {
+            "file": "scripts/verify-install.cjs",
+            "line": 70
+          },
+          {
+            "file": "public/sw.js",
+            "line": 18
+          },
+          {
+            "file": "public/sw.js",
+            "line": 29
+          }
+        ]
+      }
+    },
+    "storageSchema": {
+      "readOnly": true,
+      "containsPersonalRecords": false,
+      "tables": [
+        {
+          "tablename": "fitlife_coach_messages",
+          "rowsecurity": false
+        },
+        {
+          "tablename": "wellnest_auth_failures",
+          "rowsecurity": false
+        },
+        {
+          "tablename": "wellnest_meals",
+          "rowsecurity": false
+        },
+        {
+          "tablename": "wellnest_sessions",
+          "rowsecurity": false
+        },
+        {
+          "tablename": "wellnest_users",
+          "rowsecurity": false
+        },
+        {
+          "tablename": "wellnest_water_logs",
+          "rowsecurity": false
+        },
+        {
+          "tablename": "wellnest_weight_logs",
+          "rowsecurity": false
+        },
+        {
+          "tablename": "wellnest_workouts",
+          "rowsecurity": false
+        }
+      ],
+      "columns": [
+        {
+          "table_name": "fitlife_coach_messages",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "fitlife_coach_messages",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "fitlife_coach_messages",
+          "column_name": "role",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "fitlife_coach_messages",
+          "column_name": "content",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "fitlife_coach_messages",
+          "column_name": "sources",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "fitlife_coach_messages",
+          "column_name": "mode",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "fitlife_coach_messages",
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_auth_failures",
+          "column_name": "key",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_auth_failures",
+          "column_name": "failures",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_auth_failures",
+          "column_name": "expires_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "day",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "meal_type",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "name",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "description",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "portion",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "time",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "calories",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "protein",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "carbs",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "fat",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "image",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "completed",
+          "data_type": "boolean",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "recipe_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "cost_paise",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "ingredients",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_meals",
+          "column_name": "nutrition_source",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_sessions",
+          "column_name": "id",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_sessions",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_sessions",
+          "column_name": "expires_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "email",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "password_hash",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "name",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "is_demo",
+          "data_type": "boolean",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "age",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "gender",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "height",
+          "data_type": "real",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "current_weight",
+          "data_type": "real",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "start_weight",
+          "data_type": "real",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "target_weight",
+          "data_type": "real",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "goal",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "activity",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "diet",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "allergies",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "calorie_target",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "water_target",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "activity_target",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "reminders_enabled",
+          "data_type": "boolean",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "reminder_interval",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "recovery_key_hash",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "food_budget_paise",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "budget_period",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "experience",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "equipment",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "workout_minutes",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_users",
+          "column_name": "fitness_goal",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_water_logs",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_water_logs",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_water_logs",
+          "column_name": "amount",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_water_logs",
+          "column_name": "date",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_water_logs",
+          "column_name": "time",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_water_logs",
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_weight_logs",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_weight_logs",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_weight_logs",
+          "column_name": "weight",
+          "data_type": "real",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_weight_logs",
+          "column_name": "date",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_weight_logs",
+          "column_name": "note",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_weight_logs",
+          "column_name": "created_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "day",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "name",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "category",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "duration",
+          "data_type": "integer",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "time",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "description",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "intensity",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "table_name": "wellnest_workouts",
+          "column_name": "completed",
+          "data_type": "boolean",
+          "is_nullable": "NO"
+        }
+      ],
+      "indexes": [
+        {
+          "tablename": "fitlife_coach_messages",
+          "indexname": "fitlife_coach_messages_pkey",
+          "indexdef": "CREATE UNIQUE INDEX fitlife_coach_messages_pkey ON public.fitlife_coach_messages USING btree (id)"
+        },
+        {
+          "tablename": "wellnest_auth_failures",
+          "indexname": "wellnest_auth_failures_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_auth_failures_pkey ON public.wellnest_auth_failures USING btree (key)"
+        },
+        {
+          "tablename": "wellnest_meals",
+          "indexname": "wellnest_meals_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_meals_pkey ON public.wellnest_meals USING btree (id)"
+        },
+        {
+          "tablename": "wellnest_sessions",
+          "indexname": "wellnest_sessions_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_sessions_pkey ON public.wellnest_sessions USING btree (id)"
+        },
+        {
+          "tablename": "wellnest_users",
+          "indexname": "wellnest_users_email_unique",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_users_email_unique ON public.wellnest_users USING btree (email)"
+        },
+        {
+          "tablename": "wellnest_users",
+          "indexname": "wellnest_users_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_users_pkey ON public.wellnest_users USING btree (id)"
+        },
+        {
+          "tablename": "wellnest_water_logs",
+          "indexname": "wellnest_water_logs_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_water_logs_pkey ON public.wellnest_water_logs USING btree (id)"
+        },
+        {
+          "tablename": "wellnest_weight_logs",
+          "indexname": "wellnest_weight_logs_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_weight_logs_pkey ON public.wellnest_weight_logs USING btree (id)"
+        },
+        {
+          "tablename": "wellnest_workouts",
+          "indexname": "wellnest_workouts_pkey",
+          "indexdef": "CREATE UNIQUE INDEX wellnest_workouts_pkey ON public.wellnest_workouts USING btree (id)"
+        }
+      ]
+    },
+    "provider": {
+      "modeObserved": "local-guide",
+      "liveInterpreterConfigured": false,
+      "optionalProvider": "Groq topic classification",
+      "liveAiTested": false
+    },
+    "sourceFingerprints": [
+      {
+        "path": "drizzle.config.json",
+        "sha256": "cc44502003e85bb5258a3a5b59522c28238a052d0f19abcf14338c71474467b7"
+      },
+      {
+        "path": "eslint.config.mjs",
+        "sha256": "c971926abccc506da1532570c55a95d5298b606901c4801866a4862969c13302"
+      },
+      {
+        "path": "next.config.ts",
+        "sha256": "d5d303e234ec0958e2fbb5d28044b008cd97e866c5cf9f0c199b29028bea0613"
+      },
+      {
+        "path": "package-lock.json",
+        "sha256": "7988c0654b4b69d8f0517643cbdae783876777f26b21fe8092bffa3933fd6449"
+      },
+      {
+        "path": "package.json",
+        "sha256": "682d170edb0b0ae864bb042203dbd0bf02bf9b2a5e09309dee6f6141dc7e3c46"
+      },
+      {
+        "path": "postcss.config.mjs",
+        "sha256": "b8cd36495468ea54e029eb4b2e0e98f0feff6f95d6513e70db37a71c0e3bfba4"
+      },
+      {
+        "path": "public/fonts/dm-sans.woff2",
+        "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543"
+      },
+      {
+        "path": "public/icons/apple-touch-icon.png",
+        "sha256": "30f0e47495806ddd76c2c890cf734203b437f078623a1b1691a8d8e330eec4a8"
+      },
+      {
+        "path": "public/icons/icon-192.png",
+        "sha256": "afa856f7bd30748a4153a6b098baa2505f59d2c6883222d55b50501a365ffc1f"
+      },
+      {
+        "path": "public/icons/icon-512.png",
+        "sha256": "9c2890477aa44d1b0872625f177cc44cfdd730637da0c48dae3327ab4eb75701"
+      },
+      {
+        "path": "public/icons/icon-maskable-512.png",
+        "sha256": "a1079b656abe0f3a01243d50659ae96889ebfb90e67de1421c4fb069026fff8e"
+      },
+      {
+        "path": "public/images/banana-oats.jpg",
+        "sha256": "652150e6a9359702134518e2099d5b571ee77acd3ccf8dad8e83f0bc90f25897"
+      },
+      {
+        "path": "public/images/chana.jpg",
+        "sha256": "c7fd507f60c079896872d5c11a1fb65c3212e14ad4d65b853d911d2f7807704c"
+      },
+      {
+        "path": "public/images/chicken-bowl.jpg",
+        "sha256": "d3a13bf6762f3f03366294933e8092e72967195d0f42d11cbe637f7b68b97f8c"
+      },
+      {
+        "path": "public/images/chicken.jpg",
+        "sha256": "2a302ddeafb6eb5d8412449261cca44bf1bc4c0226ab41aa3fd99b42e53cafc6"
+      },
+      {
+        "path": "public/images/dal-rice.jpg",
+        "sha256": "24abf15fce6e0665e51f3f233d2394fb9f44537b538c20848a693f18b8bee037"
+      },
+      {
+        "path": "public/images/oats.jpg",
+        "sha256": "a0cfb11822ab7ab5b1860363c8b3c1ca9856f181c8cb6eca20818691342acaaa"
+      },
+      {
+        "path": "public/images/roti-dal.jpg",
+        "sha256": "82654785ec95efc1d17a7af0a7a1e8ffdb717a642755d4c7060eb9a07a05e366"
+      },
+      {
+        "path": "public/images/salad.jpg",
+        "sha256": "253b3338a41e19d312eaefce44bb20768c87652b17def163a9e7c3cb13541a5c"
+      },
+      {
+        "path": "public/images/salmon.jpg",
+        "sha256": "898dbb1cdcf0946a0312de4ec8e9d77a08589d56a6986b4329ba8a3a2a53ebef"
+      },
+      {
+        "path": "public/images/snack.jpg",
+        "sha256": "33861159cfe4e46ae926798fd4516c2e28cb3ca5026b41e22265517d67db9f09"
+      },
+      {
+        "path": "public/images/toast.jpg",
+        "sha256": "70615f3f5668b24f3dd3395c4a44c5ad2b2a14db369e4c0f4ed59323f1d968c7"
+      },
+      {
+        "path": "public/images/wellness-hero.webp",
+        "sha256": "ba05bc2718959364eada99f9d9922747b70693f538e9b1ceaed5a0da3ea4cd42"
+      },
+      {
+        "path": "public/offline.html",
+        "sha256": "1fb67eca5e4df2926d86fa8cf2076b452727452f4d85ba8b9ed6bac3f208e8c5"
+      },
+      {
+        "path": "public/sw.js",
+        "sha256": "3e5448c6e31ed99208af15296e0ce03cdd1ec04e91c4ad064734a2fd8e868ece"
+      },
+      {
+        "path": "scripts/verify-auth.cjs",
+        "sha256": "faa7adc9eef2c0111d56058c5e44a24873a6bc35600ed68c0b38565b2fc1c16f"
+      },
+      {
+        "path": "scripts/verify-budget-coach.cjs",
+        "sha256": "4168c7771a41f90d7203721d9d9c7a228d0d0de1ff0cc15d74c9a44cb6364eda"
+      },
+      {
+        "path": "scripts/verify-install.cjs",
+        "sha256": "47df3be5ed0f70b69ea509caf76eeb03016e53c0466e9df923ee33c15849c436"
+      },
+      {
+        "path": "scripts/verify-planner.cjs",
+        "sha256": "c63af23a287428905fdb8ed0c01e75d2f39d093b98f119bbcd003ab7ee649b49"
+      },
+      {
+        "path": "scripts/verify.cjs",
+        "sha256": "e2bc394f420fec4a175f12392dff5bd74c69e9b3fd9507191ae7f6b35826de90"
+      },
+      {
+        "path": "src/app/api/account/route.ts",
+        "sha256": "9695e07c20af694788141bb00d104e41f2054579896345f3bad49bcdaf7864b1"
+      },
+      {
+        "path": "src/app/api/auth/route.ts",
+        "sha256": "eedeef17f20b7ffabb4a4683e84177da7e6bbd80a3accf6fbd526474e1f013fb"
+      },
+      {
+        "path": "src/app/api/coach/route.ts",
+        "sha256": "c3dc49fa72473c4a7481b97b852bf52d9130e619395177ef413658227654c5ae"
+      },
+      {
+        "path": "src/app/api/dashboard/route.ts",
+        "sha256": "a034ec3cd20ac02c5f72c6176ee5cc3502f644b09d23f894b368f50c911545e2"
+      },
+      {
+        "path": "src/app/api/foods/route.ts",
+        "sha256": "83d075daf12163ce80d0df3db57f5908693c17d037a9ea61d9567653d11ab75c"
+      },
+      {
+        "path": "src/app/api/health/route.ts",
+        "sha256": "85ecde9db86952d444d593f4133df2b517ed768accc487350d35bb0db498357f"
+      },
+      {
+        "path": "src/app/api/meals/options/route.ts",
+        "sha256": "aea9860b4d00b24d7d39661e34ec35a284d69dd03107e5177fb3737b7b683c5c"
+      },
+      {
+        "path": "src/app/api/plan/route.ts",
+        "sha256": "60d3f6ec9be91bed02838756f89cb67401c91d90d34c9c5cb100ce8cf5f5f447"
+      },
+      {
+        "path": "src/app/api/profile/route.ts",
+        "sha256": "72c8d8712268322110a283ee0c95f3908cca7b00b64f2974a4a1cc581c4cfb3d"
+      },
+      {
+        "path": "src/app/api/records/route.ts",
+        "sha256": "8f48f1b056126ab91c09595932dbd36bd2c99a88426be41ff2def8f7a4ba9c94"
+      },
+      {
+        "path": "src/app/auth.css",
+        "sha256": "e9687143420b15141509c59b0a40c6840a97812f8c740a6f9c922a1c9a968d3e"
+      },
+      {
+        "path": "src/app/download/page.tsx",
+        "sha256": "264ade6b75eddfd08903bd194228417c76dde47352f666e12107ee85950eee40"
+      },
+      {
+        "path": "src/app/fitlife.css",
+        "sha256": "1dd63a5d64df76d72f42b8348d8443d615dfc45710c4a1498e73a2167692aeb0"
+      },
+      {
+        "path": "src/app/forgot-password/page.tsx",
+        "sha256": "a93d9042f42b899b673191ac6dc09675bb8b30480dd82584ff7b48233260a44e"
+      },
+      {
+        "path": "src/app/globals.css",
+        "sha256": "e22591a5614714610d0b1c0e25be6f66c1bf2fdb00845939ea42d98ad22e3525"
+      },
+      {
+        "path": "src/app/icon.svg",
+        "sha256": "290a65ba8065fed8bc4563185c42b25bfd048d7d7e86b85f5561852c53485f41"
+      },
+      {
+        "path": "src/app/install.css",
+        "sha256": "8b42cd40fc226a73bdd92de8bbf281a808e5dd17721e1dd0aa54232a2a97ddca"
+      },
+      {
+        "path": "src/app/install/page.tsx",
+        "sha256": "e9b1e60e3787d57fa984203d41ca75c97bdf8ea45852fdb2e91eb21887137ee6"
+      },
+      {
+        "path": "src/app/layout.tsx",
+        "sha256": "b365ab189700025f7853b6817a08885e7e3110961b8bf14376b22fe6dc2aa889"
+      },
+      {
+        "path": "src/app/login/page.tsx",
+        "sha256": "8d7a99fd7d60ad74c660f047858cf5824bbcacfa42ed025bb7cb51b54f613ba2"
+      },
+      {
+        "path": "src/app/manifest.ts",
+        "sha256": "9f58b0b07e87c3f78344f092ec5d1d6889cc4b9e001bde4c985219bba2145658"
+      },
+      {
+        "path": "src/app/page.tsx",
+        "sha256": "c72c75581993fe2cb931089e5d780d5c3aca5f26fb9c2aef273e361fb2141624"
+      },
+      {
+        "path": "src/app/signup/page.tsx",
+        "sha256": "0a41a837337f1f43fe4d0ca6163e0351e9e0d9911443dc15437d10beece9aca4"
+      },
+      {
+        "path": "src/components/account-security.tsx",
+        "sha256": "3c321efdee7a2e7ed849868ec5a3aa4cf056f98b056d7f1fdb561b28886ed9d6"
+      },
+      {
+        "path": "src/components/app-context.tsx",
+        "sha256": "7743fa6a5288058065159359226597bb5c170edaec5beb1fcc481e6039225512"
+      },
+      {
+        "path": "src/components/app-install-provider.tsx",
+        "sha256": "8eadc53f647a7bfa4a606cf016e50f7618c04ebeb3d33ca3e5d85a39784f9977"
+      },
+      {
+        "path": "src/components/auth-form.tsx",
+        "sha256": "ed5d892664d1b354a3d4e4915226e094bffe2a8facf892947c0a54ec1628f7e9"
+      },
+      {
+        "path": "src/components/auth-screen.tsx",
+        "sha256": "c4e2f193a4b40138f2e1e5fc511ef7478ceb4885376f97b8f346ce46080efe66"
+      },
+      {
+        "path": "src/components/budget-meal-card.tsx",
+        "sha256": "2522c882accaf20622f70f1f28d110da378440c4e38374338591ec47085957fd"
+      },
+      {
+        "path": "src/components/budget-meals-view.tsx",
+        "sha256": "9c918a7776af6ef1afbfb9a441b81a9eb49df79aae601d915230cff715b7189a"
+      },
+      {
+        "path": "src/components/coach-view.tsx",
+        "sha256": "6870a5fb6b7681dfd8a1c635c7ce5be878a366b63bfa1aca9bf1deef173ce518"
+      },
+      {
+        "path": "src/components/dialogs.tsx",
+        "sha256": "4063f10d3c7f1afbe3e2a99e5af455248b01ef1fae87325d9cc2add27b5ea3f0"
+      },
+      {
+        "path": "src/components/health-profile-form.tsx",
+        "sha256": "a5e12daf9b64499e93b01b50a536b52454a19711f5d6bf368ce1e13d3cf1c525"
+      },
+      {
+        "path": "src/components/install-app-card.tsx",
+        "sha256": "0c2fe8250e42acfea08d9942050b825cf925c9e42f717824a25e4a7121471649"
+      },
+      {
+        "path": "src/components/install-app-link.tsx",
+        "sha256": "0a9473d20cf51fead9fbf64b8f42db8165baa6566f21cdeb15702a9916d597ce"
+      },
+      {
+        "path": "src/components/installation-page.tsx",
+        "sha256": "0d72d3077bf6afe9e68e6dea383ff3a2e7b54f421fec75aa9d4125c5e3431bf0"
+      },
+      {
+        "path": "src/components/meal-dialogs.tsx",
+        "sha256": "0ed64e3d5cd3fa2c88db16f86ddb35eba2fa68627a3363485b3abaf404b302a8"
+      },
+      {
+        "path": "src/components/profile-views.tsx",
+        "sha256": "9c0148a94ced1c7b0eb688f791012d9526fce73686baf7613bc052b528662e77"
+      },
+      {
+        "path": "src/components/tracking-views.tsx",
+        "sha256": "de2387362e1857d2f7f5e7ca90ee513229181485d9edbedf00d8a442e2114567"
+      },
+      {
+        "path": "src/components/ui.tsx",
+        "sha256": "81cd2462aef3f59fb36d340ec1379c5d813bef86344955b8f87e55cd0fa56f7a"
+      },
+      {
+        "path": "src/components/views.tsx",
+        "sha256": "cddec339c32e350d8f58a9d9899bf9a42fc4afc95d782e5578bee6cbacca3dd7"
+      },
+      {
+        "path": "src/components/wellnest-app.tsx",
+        "sha256": "68a034c9d3293ad9ed4db9737fbffa87e6d1f162e8c5ba42726ed9ec5996506f"
+      },
+      {
+        "path": "src/db/index.ts",
+        "sha256": "44d8e984cf4d238facb3e984c6a2ffa7abfca11768da1304ff439d2b7246990b"
+      },
+      {
+        "path": "src/db/schema.ts",
+        "sha256": "36edacbc9a1ac43651cf1be4c75ff843d9124b8110640dea1c372f1a0abfdafb"
+      },
+      {
+        "path": "src/lib/auth-client.ts",
+        "sha256": "74069d59dadc991a232e95d7a26ec0e722c6d841dff931c2dda861b7cc5c4a58"
+      },
+      {
+        "path": "src/lib/auth-core.ts",
+        "sha256": "08eac4103b291b8e87dc24c95bfd3ee0710b62693da03a483a5036cb07942041"
+      },
+      {
+        "path": "src/lib/coach-engine.ts",
+        "sha256": "0ff67602d0b812451926e1757a058de4b66498d9721aab78fb315f381829c736"
+      },
+      {
+        "path": "src/lib/coach-provider.ts",
+        "sha256": "73633e33683026876c84746bbd3782a490395c0009f58cdb108c9412fb5997d7"
+      },
+      {
+        "path": "src/lib/food-catalog.ts",
+        "sha256": "a8612987db1db47a43f041637c4212f12dc2cb9b94091b27ae148ed82d3d378f"
+      },
+      {
+        "path": "src/lib/planner.ts",
+        "sha256": "b3e22bfa3cb6e9403fbc2bf2b079584699519d2db2baf931246606cba67db777"
+      },
+      {
+        "path": "src/lib/server.ts",
+        "sha256": "e2c2f4ceffffdabf95e599520db558c24da69f145b8d65864e8328aa46ebfac6"
+      },
+      {
+        "path": "src/lib/types.ts",
+        "sha256": "4e12a665f71a99c99f894c855041cf3ebd354a28d2d52c8c38d30c4bab6a37df"
+      },
+      {
+        "path": "tsconfig.json",
+        "sha256": "4ea5303fb21d01b83151db57d43246ba2ac0bbb4e79b9e83b3a120b2599c4351"
+      }
+    ],
+    "integrityVerification": {
+      "checkedAt": "2026-10-30T22:17:30.358Z",
+      "filesChecked": 83,
+      "changedFiles": []
+    }
+  },
+  "baselineTests": {
+    "coreBrowserGroups": 11,
+    "authBrowserGroups": 12,
+    "installBrowserGroups": 8,
+    "budgetCoachBrowserGroups": 6,
+    "totalBrowserGroups": 37,
+    "browserErrorsReported": false,
+    "plannerCombinations": 112,
+    "feasiblePlannerCases": 52,
+    "typeGeneration": "passed",
+    "typescriptNoEmit": "passed",
+    "productionBuild": "passed",
+    "managedBootstrapHealthcheck": "passed",
+    "lint": {
+      "errors": 12,
+      "warnings": 5,
+      "rules": {
+        "@next/next/no-assign-module-variable": 1,
+        "@next/next/no-html-link-for-pages": 8,
+        "react-hooks/set-state-in-effect": 3,
+        "@next/next/no-img-element": 4,
+        "react-hooks/exhaustive-deps": 1
+      }
+    },
+    "dependencyScan": {
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 1,
+        "high": 4,
+        "critical": 1,
+        "total": 6
+      },
+      "packages": [
+        {
+          "name": "baseline-browser-mapping",
+          "severity": "moderate",
+          "direct": false,
+          "fix": true,
+          "critical": []
+        },
+        {
+          "name": "nanoid",
+          "severity": "high",
+          "direct": false,
+          "fix": true,
+          "critical": []
+        },
+        {
+          "name": "next",
+          "severity": "critical",
+          "direct": true,
+          "fix": {
+            "name": "next",
+            "version": "16.4.3",
+            "isSemVerMajor": false
+          },
+          "critical": [
+            {
+              "title": "Next.js: Unauthenticated Remote Code Execution on windows-hosted servers",
+              "url": "https://github.com/advisories/GHSA-p293-qw3h-jr36"
+            },
+            {
+              "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when AVIF files are used",
+              "url": "https://github.com/advisories/GHSA-2xp9-vwfh-vxw4"
+            },
+            {
+              "title": "Next.js: Remote Code Execution in next/og ImageResponse",
+              "url": "https://github.com/advisories/GHSA-vcvr-r3jv-pc5j"
+            },
+            {
+              "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+              "url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw"
+            },
+            {
+              "title": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+              "url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr"
+            }
+          ]
+        },
+        {
+          "name": "postcss",
+          "severity": "high",
+          "direct": false,
+          "fix": {
+            "name": "next",
+            "version": "16.4.3",
+            "isSemVerMajor": false
+          },
+          "critical": []
+        },
+        {
+          "name": "sharp",
+          "severity": "high",
+          "direct": false,
+          "fix": {
+            "name": "next",
+            "version": "16.4.3",
+            "isSemVerMajor": false
+          },
+          "critical": []
+        },
+        {
+          "name": "source-map-js",
+          "severity": "high",
+          "direct": false,
+          "fix": true,
+          "critical": []
+        }
+      ]
+    },
+    "nativeSensorsAndHealthConnect": "not implemented / not physically tested",
+    "fullMasterAcceptance": "not met"
+  },
+  "readOnlyPlannerProbe": {
+    "fixture": "Synthetic 29-year-old, 175 cm, 70 kg, moderate activity. Not a real user.",
+    "foodCount": 17,
+    "recipeCount": 18,
+    "scenarios": [
+      {
+        "diet": "vegetarian",
+        "weightGoal": "gain",
+        "budgetRupeesPerDay": 120,
+        "targetCalories": 2650,
+        "mealCount": 28,
+        "slotsPerDay": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "dailyCostRupeeRange": [
+          77.54,
+          117.51
+        ],
+        "dailyCaloriesRange": [
+          2641,
+          2653
+        ],
+        "dailyProteinRange": [
+          92,
+          119
+        ],
+        "generalExerciseReferenceProteinRange": [
+          98,
+          140
+        ],
+        "distinctBreakfasts": 5,
+        "adjacentLunchRepeats": 0,
+        "identicalOnRegeneration": true,
+        "overBudgetDays": 0
+      },
+      {
+        "diet": "vegetarian",
+        "weightGoal": "lose",
+        "budgetRupeesPerDay": 150,
+        "targetCalories": 2050,
+        "mealCount": 28,
+        "slotsPerDay": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "dailyCostRupeeRange": [
+          59.94,
+          90.91
+        ],
+        "dailyCaloriesRange": [
+          2048,
+          2053
+        ],
+        "dailyProteinRange": [
+          73,
+          93
+        ],
+        "generalExerciseReferenceProteinRange": [
+          98,
+          140
+        ],
+        "distinctBreakfasts": 5,
+        "adjacentLunchRepeats": 0,
+        "identicalOnRegeneration": true,
+        "overBudgetDays": 0
+      },
+      {
+        "diet": "eggetarian",
+        "weightGoal": "gain",
+        "budgetRupeesPerDay": 150,
+        "targetCalories": 2650,
+        "mealCount": 28,
+        "slotsPerDay": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "dailyCostRupeeRange": [
+          124.98,
+          133.1
+        ],
+        "dailyCaloriesRange": [
+          2702,
+          2727
+        ],
+        "dailyProteinRange": [
+          124,
+          134
+        ],
+        "generalExerciseReferenceProteinRange": [
+          98,
+          140
+        ],
+        "distinctBreakfasts": 2,
+        "adjacentLunchRepeats": 3,
+        "identicalOnRegeneration": true,
+        "overBudgetDays": 0
+      },
+      {
+        "diet": "nonvegetarian",
+        "weightGoal": "lose",
+        "budgetRupeesPerDay": 150,
+        "targetCalories": 2050,
+        "mealCount": 28,
+        "slotsPerDay": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "dailyCostRupeeRange": [
+          103.16,
+          123
+        ],
+        "dailyCaloriesRange": [
+          2033,
+          2050
+        ],
+        "dailyProteinRange": [
+          95,
+          107
+        ],
+        "generalExerciseReferenceProteinRange": [
+          98,
+          140
+        ],
+        "distinctBreakfasts": 6,
+        "adjacentLunchRepeats": 3,
+        "identicalOnRegeneration": true,
+        "overBudgetDays": 0
+      },
+      {
+        "diet": "vegan",
+        "weightGoal": "gain",
+        "budgetRupeesPerDay": 120,
+        "targetCalories": 2650,
+        "mealCount": 28,
+        "slotsPerDay": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "dailyCostRupeeRange": [
+          75.47,
+          86.03
+        ],
+        "dailyCaloriesRange": [
+          2639,
+          2655
+        ],
+        "dailyProteinRange": [
+          93,
+          121
+        ],
+        "generalExerciseReferenceProteinRange": [
+          98,
+          140
+        ],
+        "distinctBreakfasts": 4,
+        "adjacentLunchRepeats": 0,
+        "identicalOnRegeneration": true,
+        "overBudgetDays": 0
+      },
+      {
+        "diet": "vegan",
+        "weightGoal": "lose",
+        "budgetRupeesPerDay": 150,
+        "targetCalories": 2050,
+        "mealCount": 28,
+        "slotsPerDay": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "dailyCostRupeeRange": [
+          58.64,
+          66.62
+        ],
+        "dailyCaloriesRange": [
+          2049,
+          2054
+        ],
+        "dailyProteinRange": [
+          74,
+          91
+        ],
+        "generalExerciseReferenceProteinRange": [
+          98,
+          140
+        ],
+        "distinctBreakfasts": 4,
+        "adjacentLunchRepeats": 0,
+        "identicalOnRegeneration": true,
+        "overBudgetDays": 0
+      }
+    ],
+    "workouts": [
+      {
+        "minutes": 20,
+        "weeklyEntries": 14,
+        "uniqueStrengthDescriptions": 1,
+        "datesOrActualSetsStored": false
+      },
+      {
+        "minutes": 30,
+        "weeklyEntries": 14,
+        "uniqueStrengthDescriptions": 1,
+        "datesOrActualSetsStored": false
+      },
+      {
+        "minutes": 45,
+        "weeklyEntries": 14,
+        "uniqueStrengthDescriptions": 1,
+        "datesOrActualSetsStored": false
+      }
+    ]
+  },
+  "isolatedBehaviorProbe": {
+    "scope": "Only one newly generated audit account; no pre-existing account accessed.",
+    "beforeRegistration": {
+      "isDemo": true,
+      "weights": 8,
+      "water": 52,
+      "meals": 28,
+      "workouts": 14,
+      "hasOnboardingFlag": false
+    },
+    "afterRegistration": {
+      "isDemo": false,
+      "weights": 8,
+      "water": 52,
+      "profileDefaultsRemain": true
+    },
+    "cosmeticProfileSave": {
+      "sentinelMealRetained": false,
+      "sentinelWorkoutRetained": false,
+      "weightHistoryCount": 8,
+      "waterHistoryCount": 52
+    },
+    "coachMode": {
+      "mode": "local-guide",
+      "interpreterConfigured": false
+    }
+  },
+  "timezoneExample": {
+    "instant": "2026-10-30T21:00:00.000Z",
+    "utcDateUsedByTodayKey": "2026-10-30",
+    "asiaKolkataLocalDate": "2026-10-31"
+  },
+  "privacy": "No production profile/password/token/health-record values are included. Database inspection contains schema metadata only; behavior data is from newly generated isolated audit fixtures."
+}
