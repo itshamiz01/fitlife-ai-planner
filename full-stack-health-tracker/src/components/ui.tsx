@@ -1,11 +1,12 @@
 "use client";
+import Image from "next/image";
 import { weightChartBounds } from "@/lib/weight-progress";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X, Plus, Leaf, Droplets, Check, ArrowUpRight, LoaderCircle, Pencil, Trash2, ChevronRight } from "lucide-react";
 import type { Meal, WeightLog } from "@/lib/types";
 
 export function Brand({ small = false }: { small?: boolean }) {
-  return <span className={`brand ${small ? "brand-small" : ""}`}><span className="brand-mark"><Leaf size={22} strokeWidth={2.1} /></span><span className="brand-wordmark">Fit Life <strong>Bro</strong></span></span>;
+  return <span className={`brand ${small ? "brand-small" : ""}`}><span className="brand-mark"><Image src="/icons/icon-192-dual-leaf.png" alt="" width={33} height={33} /></span><span className="brand-wordmark">Fit Life <strong>Bro</strong></span></span>;
 }
 export function Button({ children, className = "", variant = "primary", loading = false, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost" | "danger"; loading?: boolean }) {
   return <button className={`btn btn-${variant} ${className}`} {...props} disabled={loading || props.disabled}>{loading && <LoaderCircle className="spin" size={16} />}{children}</button>;

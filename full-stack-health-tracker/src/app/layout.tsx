@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   applicationName: "Fit Life Bro",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Fit Life Bro", statusBarStyle: "default" },
-  icons: { apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }] },
+  icons: { apple: [{ url: "/icons/apple-touch-icon-dual-leaf.png", sizes: "180x180", type: "image/png" }] },
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#3d7046" };
 export default function RootLayout({ children }: { children: ReactNode }) {

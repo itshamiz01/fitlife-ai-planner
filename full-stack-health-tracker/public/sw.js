@@ -1,8 +1,8 @@
 /* Fit Life Bro caches public assets only. Health records, sessions, API responses,
    and online HTML pages must always come from the server. */
-const CACHE_NAME = "fitlife-public-v2";
+const CACHE_NAME = "fitlife-public-v3";
 const OFFLINE_PAGE = "/offline.html";
-const PUBLIC_SHELL = [OFFLINE_PAGE, "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
+const PUBLIC_SHELL = [OFFLINE_PAGE, "/icons/icon-192-dual-leaf.png", "/icons/icon-512-dual-leaf.png", "/icons/apple-touch-icon-dual-leaf.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(PUBLIC_SHELL)).then(() => self.skipWaiting()));
@@ -47,7 +47,7 @@ self.addEventListener("push", event => {
   try { payload = event.data ? event.data.json() : {}; } catch { /* Use a safe generic message. */ }
   const title = typeof payload.title === "string" ? payload.title.slice(0, 100) : "Time for a water break 💧";
   const body = typeof payload.body === "string" ? payload.body.slice(0, 200) : "Take a water break if you need one.";
-  event.waitUntil(self.registration.showNotification(title, { body, icon: "/icons/icon-192.png", badge: "/icons/icon-192.png", tag: "fitlife-water-push", data: { url: "/?view=water" } }));
+  event.waitUntil(self.registration.showNotification(title, { body, icon: "/icons/icon-192-dual-leaf.png", badge: "/icons/icon-192-dual-leaf.png", tag: "fitlife-water-push", data: { url: "/?view=water" } }));
 });
 self.addEventListener("notificationclick", event => {
   event.notification.close();

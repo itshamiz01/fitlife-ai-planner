@@ -8,7 +8,7 @@ const read = p => fs.readFileSync(path.join(root, p));
 const publicFile = url => path.join(root, 'public', url.replace(/^\//, ''));
 const manifest = read('src/app/manifest.ts').toString();
 const layout = read('src/app/layout.tsx').toString();
-for (const [name, size] of [['icon-192.png',192],['icon-512.png',512],['icon-maskable-512.png',512],['apple-touch-icon.png',180]]) {
+for (const [name, size] of [['icon-192-dual-leaf.png',192],['icon-512-dual-leaf.png',512],['icon-maskable-512-dual-leaf.png',512],['apple-touch-icon-dual-leaf.png',180]]) {
   const url = `/icons/${name}`;
   assert.ok((manifest + layout).includes(url), `${url} must be referenced`);
   const data = fs.readFileSync(publicFile(url));

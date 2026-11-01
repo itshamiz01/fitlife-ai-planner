@@ -14,9 +14,9 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "en",
     categories: ["health", "fitness", "lifestyle"],
     icons: [
-      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: "/icons/icon-192-dual-leaf.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-512-dual-leaf.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-maskable-512-dual-leaf.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
     shortcuts: [
       { name: "Log a water break", short_name: "Water", description: "A little sip, a little better.", url: "/?view=water" },
