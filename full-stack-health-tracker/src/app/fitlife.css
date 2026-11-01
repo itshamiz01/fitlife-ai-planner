@@ -63,3 +63,88 @@ body { background: #f3f1e9 url('/images/glass-leaves.svg') center top / cover fi
 
 /* Approved dual-leaf artwork is already tilted; do not rotate it again. */
 .brand-mark{overflow:hidden;transform:none}.brand-mark img{width:100%;height:100%;object-fit:cover}
+
+/* Visible hanging fronds: size to viewport width rather than cover, so mobile
+   doesn't crop away the sides of the artwork. Panels remain legible. */
+body {
+  background-color: #e9e5d8;
+  background-image: url('/images/glass-leaves.svg'), linear-gradient(145deg, #e8d9ca 0%, #e8e9d8 45%, #d9e4d0 100%);
+  background-size: min(100%, 900px) auto, 100% 100%;
+  background-position: center top, center;
+  background-repeat: repeat-y, no-repeat;
+  background-attachment: scroll, fixed;
+}
+.panel, .stat-card, .meal-card, .workout-card {
+  background-color: rgba(255, 254, 248, .72);
+  border-color: rgba(255, 255, 255, .78);
+  box-shadow: 0 12px 32px rgba(54, 69, 45, .10), inset 0 1px 0 rgba(255,255,255,.75);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.sidebar, .topbar { background: rgba(253, 252, 245, .88); }
+.water-hero { background-color: rgba(239, 248, 252, .83); }
+@media (prefers-reduced-transparency: reduce) {
+  .sidebar, .topbar, .panel, .stat-card, .meal-card, .workout-card { background-color: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .water-hero { background-color: #f4f9fc; }
+}
+
+/* Real trailing vines stay in the background as the page scrolls. */
+body {
+  position: relative;
+  isolation: isolate;
+  background: #e9e5d8;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #f1eee5 url('/images/sparse-vines-revision.webp') center top / cover no-repeat;
+}
+.panel, .stat-card, .meal-card, .workout-card {
+  background-color: rgba(255, 254, 248, .81);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .panel, .stat-card, .meal-card, .workout-card { background-color: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+.page-heading {
+  padding: 13px 16px;
+  border: 1px solid rgba(255,255,255,.58);
+  border-radius: 14px;
+  background: rgba(255, 254, 248, .72);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .page-heading { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* Organic glassmorphism: frosted surfaces over the hanging real leaves. */
+.page-heading, .panel, .stat-card, .meal-card, .workout-card, .recipe-library-card {
+  background-color: rgba(255, 253, 245, .68);
+  border: 1px solid rgba(255, 255, 255, .72);
+  box-shadow: 0 10px 30px rgba(52, 67, 46, .13), inset 0 1px 0 rgba(255,255,255,.72);
+  -webkit-backdrop-filter: blur(15px) saturate(120%);
+  backdrop-filter: blur(15px) saturate(120%);
+}
+.goal-card, .budget-plan-banner {
+  background: rgba(34, 76, 53, .92);
+  border: 1px solid rgba(224, 239, 217, .3);
+  box-shadow: 0 12px 30px rgba(32, 65, 45, .17), inset 0 1px 0 rgba(255,255,255,.15);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.water-hero { background-color: rgba(239, 248, 252, .78); }
+@media (prefers-reduced-transparency: reduce) {
+  .page-heading, .panel, .stat-card, .meal-card, .workout-card, .recipe-library-card { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .goal-card, .budget-plan-banner { background: #264d36; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .water-hero { background: #f4f9fc; }
+}
+
+/* Airy frosted cards, with a clear fallback when translucency is disabled. */
+.page-heading, .panel, .stat-card, .meal-card, .workout-card, .recipe-library-card { border-radius: 16px; }
+.sidebar, .topbar { background: rgba(251, 250, 244, .75); -webkit-backdrop-filter: blur(18px) saturate(115%); backdrop-filter: blur(18px) saturate(115%); }
+@media (prefers-reduced-transparency: reduce) { .sidebar, .topbar { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; } }
