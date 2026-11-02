@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { and, eq, desc, ne } from "drizzle-orm";
 import { db } from "@/db";
-import { meals, workouts, waterLogs, weightLogs, users } from "@/db/schema";
+import { meals, workouts, waterLogs, weightLogs, users, waterReminderConfirmations } from "@/db/schema";
 import { ApiError, apiError, requireUser, checkOrigin, choice, text, number, validDate, validTime, getDashboardData, publicProfile } from "@/lib/server";
 
 import { recipes, compatibleRecipe, foodById } from "@/lib/food-catalog";
@@ -107,7 +107,22 @@ async function mutate(request: Request, method: "POST" | "PATCH" | "DELETE") {
       else changed = (await db.update(workouts).set(typeof body.completed === "boolean" ? { completed: body.completed } : workoutValues(body)).where(where).returning()).length > 0;
     } else if (resource === "water") {
       const where = and(eq(waterLogs.id, id), eq(waterLogs.userId, user.id));
-      if (method === "POST") { await db.insert(waterLogs).values({ ...waterValues(body), userId: user.id }); changed = true; }
+      if (method === "POST") {
+        const values = waterValues(body);
+        if (body.idempotencyKey !== undefined) {
+          if (typeof body.idempotencyKey !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.idempotencyKey)) throw new ApiError("Invalid reminder confirmation ID.");
+          const key = body.idempotencyKey;
+          await db.transaction(async tx => {
+            const inserted = await tx.insert(waterReminderConfirmations).values({ userId: user.id, requestId: key, amount: values.amount }).onConflictDoNothing().returning({ requestId: waterReminderConfirmations.requestId });
+            if (inserted.length) await tx.insert(waterLogs).values({ ...values, userId: user.id });
+            else {
+              const [prior] = await tx.select({ amount: waterReminderConfirmations.amount }).from(waterReminderConfirmations).where(and(eq(waterReminderConfirmations.userId, user.id), eq(waterReminderConfirmations.requestId, key)));
+              if (!prior || prior.amount !== values.amount) throw new ApiError("This reminder was already confirmed with a different amount. Review your water history.", 409);
+            }
+          });
+        } else await db.insert(waterLogs).values({ ...values, userId: user.id });
+        changed = true;
+      }
       else if (method === "DELETE") changed = (await db.delete(waterLogs).where(where).returning()).length > 0;
       else changed = (await db.update(waterLogs).set(waterValues(body)).where(where).returning()).length > 0;
     } else {

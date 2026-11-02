@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, real, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, real, boolean, timestamp, jsonb, primaryKey } from "drizzle-orm/pg-core";
 import type { MealIngredient, CoachSource } from "@/lib/types";
 
 export const users = pgTable("wellnest_users", {
@@ -168,3 +168,11 @@ export const waterPushSubscriptions = pgTable("fitlife_water_push_subscriptions"
   nextDue: timestamp("next_due", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+// Retain confirmed request IDs even if a water entry is later deleted.
+export const waterReminderConfirmations = pgTable("fitlife_water_reminder_confirmations", {
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  requestId: uuid("request_id").notNull(),
+  amount: integer("amount").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, table => [primaryKey({ columns: [table.userId, table.requestId] })]);

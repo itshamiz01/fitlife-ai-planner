@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
+import { timingSafeEqual, randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { and, asc, eq, lte } from "drizzle-orm";
 import webpush from "web-push";
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       if (!stillEnabled || !validPushEndpoint(row.subscription.endpoint)) return;
       attempted++;
       try {
-        await webpush.sendNotification({ endpoint: row.subscription.endpoint, keys: { p256dh: row.subscription.p256dh, auth: row.subscription.auth } }, JSON.stringify(pushMessage(row.name)), { TTL: 300, timeout: 10000 });
+        await webpush.sendNotification({ endpoint: row.subscription.endpoint, keys: { p256dh: row.subscription.p256dh, auth: row.subscription.auth } }, JSON.stringify({ ...pushMessage(row.name), reminderId: randomUUID() }), { TTL: 300, timeout: 10000 });
         accepted++;
       } catch (error) {
         const status = error && typeof error === "object" && "statusCode" in error ? error.statusCode : null;

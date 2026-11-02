@@ -148,3 +148,28 @@ body::before {
 .page-heading, .panel, .stat-card, .meal-card, .workout-card, .recipe-library-card { border-radius: 16px; }
 .sidebar, .topbar { background: rgba(251, 250, 244, .75); -webkit-backdrop-filter: blur(18px) saturate(115%); backdrop-filter: blur(18px) saturate(115%); }
 @media (prefers-reduced-transparency: reduce) { .sidebar, .topbar { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; } }
+
+/* Optional body screening is separate from the editable profile form. */
+.body-assessment { padding: 22px; margin-bottom: 20px; }
+.body-assessment-content { display: grid; gap: 16px; margin-top: 16px; }
+.body-assessment-content > p, .body-assessment-results p { color: #415647; font-size: 14px; line-height: 1.6; }
+.body-assessment-content > .btn { justify-self: start; }
+.body-assessment-results { display: grid; gap: 12px; }
+.body-assessment-results dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.body-assessment-results dl div { padding: 12px; border-radius: 12px; background: rgba(255,255,255,.62); }
+.body-assessment-results dt { color: #516554; font-size: 12px; }
+.body-assessment-results dd { color: #253c2c; font-weight: 650; margin-top: 4px; overflow-wrap: anywhere; }
+.body-assessment-results a { color: #285f3a; text-decoration: underline; }
+@media (max-width: 520px) { .body-assessment { padding: 16px; } .body-assessment-results dl { grid-template-columns: 1fr; } }
+
+/* Optional hydration guidance does not alter saved water goals or history. */
+.hydration-estimate { padding: 22px; margin: 20px 0; }
+.hydration-estimate form, .hydration-estimate-result { display: grid; gap: 14px; margin-top: 16px; }
+.hydration-estimate p { font-size: 14px; line-height: 1.6; color: #344e42; }
+.hydration-estimate form > .btn { justify-self: start; }
+.hydration-estimate-result { border-top: 1px solid rgba(90, 122, 100, .25); padding-top: 14px; }
+.hydration-estimate-result a { color: #285f3a; text-decoration: underline; }
+@media (max-width: 520px) { .hydration-estimate { padding: 16px; } }
+
+.water-alarm .reminder-amount { display: grid; gap: 5px; color: #324b3a; text-align: left; font-size: 13px; font-weight: 600; margin: 12px 0; }
+.water-alarm .reminder-amount input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #a9b8a9; border-radius: 9px; background: #fff; color: #203927; font: inherit; }

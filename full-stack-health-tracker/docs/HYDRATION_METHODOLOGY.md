@@ -26,3 +26,11 @@ Example: 70 kg adult, safety questions negative, moderate/cool conditions → es
 ## Status and verification
 
 Synthetic unit checks: `node scripts/verify-hydration-engine.cjs`. Scenarios include office, outdoor, delivery, gym, home, safety flags, clinician override, missing contributions, invalid values and sweat-loss arithmetic. There is no clinical review, UI, persistent hydration profile, schedule, reminder action, weather provider, background push, user history integration, timezone handling or live database testing in this phase. No new dependency, migration or production operation is needed for the standalone module.
+
+## Development UI stage (2026-11-02)
+
+An optional Water tracker panel now uses the standalone draft with the user's saved age and weight and explicit safety/work/heat inputs. Answers and output are held only in browser component state; no profile, target, logs or reminder schedule is written. A user may enter a clinician-prescribed amount for all beverages and an optional estimate for other drinks; it is not treated as a plain-water target. The draft still does not numerically adjust for work, heat or exercise, generate a drinking schedule, or claim clinical validation. Height does not drive a numerical estimate. Earlier statements in this document about no UI describe the earlier standalone phase; this development panel does not imply deployment or professional validation.
+
+## Production release gate
+
+The development panel is disabled in the release build pending independent clinical review of the community extrapolation. The draft source remains available for further work; no personalized numeric hydration suggestion or automatic heat adjustment is enabled. This release does not change saved water targets or turn the draft into a medical recommendation.

@@ -53,6 +53,8 @@ export default function WellnestApp() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [reminderVisible, setReminderVisible] = useState(false);
+  const [reminderAmount, setReminderAmount] = useState("");
+  const reminderId = useRef<string | null>(null);
   const [nextReminder, setNextReminder] = useState(0);
   const [notificationPermission, setNotificationPermission] = useState("default");
   const started = useRef(false);
@@ -80,7 +82,7 @@ export default function WellnestApp() {
   }, []);
   useEffect(() => { if (!started.current) { started.current = true; void load(); } }, [load]);
   useEffect(() => {
-    function readView() { const param = new URLSearchParams(window.location.search).get("view"); if (param && Object.keys(titles).includes(param)) setView(param as View); else setView("dashboard"); }
+    function readView() { const url = new URL(window.location.href); const param = url.searchParams.get("view"); if (param && Object.keys(titles).includes(param)) setView(param as View); else setView("dashboard"); if (param === "water" && url.searchParams.get("reminder") === "confirm") { const id = url.searchParams.get("reminderId"); reminderId.current = id && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(id) ? id : newReminderId(); setReminderAmount(""); setReminderVisible(true); url.searchParams.delete("reminder"); url.searchParams.delete("reminderId"); window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash); } }
     readView(); window.addEventListener("popstate", readView);
 
     return () => { window.removeEventListener("popstate", readView); if (toastTimer.current) clearTimeout(toastTimer.current); };
@@ -119,7 +121,7 @@ export default function WellnestApp() {
     window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, []);
   const showReminder = useCallback(() => {
-    setReminderVisible(true);
+    reminderId.current = newReminderId(); setReminderAmount(""); setReminderVisible(true);
     if ("Notification" in window && Notification.permission === "granted") {
       try { new Notification("A little sip, a little better 💧", { body: "Time for a water break. Your next glass is a small step toward feeling good.", tag: "wellnest-water" }); } catch { /* In-app reminders remain available on unsupported browsers. */ }
     }
@@ -220,10 +222,16 @@ export default function WellnestApp() {
     {data && <Dialogs />}
     {data && view !== "coach" && <button className="nivra-launcher" onClick={() => navigate("coach")} aria-label="Ask Nivra, your fitness guide"><span><Sparkles size={20} /></span><span>Ask Nivra</span><MessageCircle size={15} /></button>}
     {toast && <div className={`toast toast-${toast.type}`} role={toast.type === "error" ? "alert" : "status"}>{toast.type === "success" ? <span className="toast-icon"><Check size={15} /></span> : <AlertCircle size={19} />}<span>{toast.message}</span><button onClick={() => setToast(null)} aria-label="Dismiss notification"><X size={16} /></button></div>}
-    {reminderVisible && <div className="water-alarm" role="alert"><span className="alarm-drop"><Droplets size={25} /></span><button className="alarm-close icon-button" onClick={() => { setReminderVisible(false); setNextReminder(Date.now() + 600000); }} aria-label="Snooze reminder for 10 minutes"><X size={17} /></button><h3>A little sip, a little better.</h3><p>Take a breath. Have a glass of water.<br />Your body will thank you.</p><Button onClick={() => { const now = new Date(); void mutate("water", "POST", { amount: 250, date: todayKey(), time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}` }, "Cheers to a healthier you! +250 ml logged."); }} loading={saving}><PlusWater />I had a glass · 250 ml</Button><button className="snooze-button" onClick={() => { setReminderVisible(false); setNextReminder(Date.now() + 600000); }}>Remind me in 10 minutes</button></div>}
+    {reminderVisible && data && <div className="water-alarm" role="dialog" aria-labelledby="water-reminder-title"><span className="alarm-drop"><Droplets size={25} /></span><button className="alarm-close icon-button" onClick={() => { setReminderVisible(false); setNextReminder(Date.now() + 600000); }} aria-label="Snooze reminder for 10 minutes"><X size={17} /></button><h3 id="water-reminder-title">A little sip, a little better.</h3><p>Only log water you actually drank. Follow your clinician’s fluid advice.</p><p>Logging for: <strong>{data.user.name}</strong>{data.user.isDemo ? " (demo)" : ""}</p><form onSubmit={event => { event.preventDefault(); const amount = Number(reminderAmount); if (!Number.isInteger(amount) || amount < 50 || amount > 2000 || saving) return; if (!reminderId.current) { notify("A secure reminder ID could not be created. Use the water tracker to log instead.", "error"); return; } const now = new Date(); void mutate("water", "POST", { amount, idempotencyKey: reminderId.current, date: todayKey(), time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}` }, `Water logged: ${amount} ml.`); }}><label className="reminder-amount">Amount you drank (ml)<input type="number" inputMode="numeric" min="50" max="2000" step="1" required value={reminderAmount} onChange={event => setReminderAmount(event.target.value)} placeholder="Enter amount" /></label><Button type="submit" loading={saving}><PlusWater />Yes, log my water</Button></form><button className="snooze-button" onClick={() => { setReminderVisible(false); setNextReminder(Date.now() + 600000); }}>Remind me in 10 minutes</button></div>}
   </div>;
   if (!data) return shell;
   return <WellnestContext.Provider value={{ data, view, selectedDay, setSelectedDay, navigate, openModal, closeModal, modal, saving, mutate, saveProfile, completeAuthentication, signOut, regenerate, notify, enableNotifications, testReminder: showReminder, notificationPermission, nextReminder }}>{shell}</WellnestContext.Provider>;
+}
+function newReminderId(): string | null {
+  if (typeof crypto === "undefined" || !crypto.getRandomValues) return null;
+  const bytes = crypto.getRandomValues(new Uint8Array(16)); bytes[6] = (bytes[6] & 15) | 64; bytes[8] = (bytes[8] & 63) | 128;
+  const h = Array.from(bytes, value => value.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
 }
 function PlusWater() { return <Droplets size={16} />; }
 function DashboardSkeleton() {

@@ -46,13 +46,17 @@ self.addEventListener("push", event => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; } catch { /* Use a safe generic message. */ }
   const title = typeof payload.title === "string" ? payload.title.slice(0, 100) : "Time for a water break 💧";
+  const reminderId = typeof payload.reminderId === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(payload.reminderId) ? payload.reminderId : null;
   const body = typeof payload.body === "string" ? payload.body.slice(0, 200) : "Take a water break if you need one.";
-  event.waitUntil(self.registration.showNotification(title, { body, icon: "/icons/icon-192-dual-leaf.png", badge: "/icons/icon-192-dual-leaf.png", tag: "fitlife-water-push", data: { url: "/?view=water" } }));
+  event.waitUntil(self.registration.showNotification(title, { body, icon: "/icons/icon-192-dual-leaf.png", badge: "/icons/icon-192-dual-leaf.png", tag: "fitlife-water-push", actions: [{ action: "confirm-water", title: "I drank water" }], data: { reminderId } }));
 });
 self.addEventListener("notificationclick", event => {
   event.notification.close();
   event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async clients => {
-    const url = new URL("/?view=water", self.location.origin).href;
+    const destination = new URL("/?view=water&reminder=confirm", self.location.origin);
+    const reminderId = event.notification.data?.reminderId;
+    if (typeof reminderId === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(reminderId)) destination.searchParams.set("reminderId", reminderId);
+    const url = destination.href;
     const existing = clients.find(client => new URL(client.url).origin === self.location.origin);
     if (existing) { await existing.navigate(url); return existing.focus(); }
     return self.clients.openWindow(url);
