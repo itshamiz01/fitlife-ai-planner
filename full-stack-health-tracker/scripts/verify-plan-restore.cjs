@@ -18,7 +18,7 @@ const server={ApiError,apiError:e=>({status:e.status||500,body:{error:e.message,
 const route=routeLoad('src/app/api/plan/archives/route.ts',{'next/server':{NextResponse:{json:(body,options={})=>({body,status:options.status||200,headers:options.headers})}},'@/db':{db},'@/db/schema':schema,'@/lib/server':server,'@/lib/profile-plan-change':{profileChangesPlan},'@/lib/plan-archive':{restoreArchivedPlan}});
 const request=id=>({json:async()=>({id})});
 (async()=>{
- await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));
+ await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));await engine.exec(fs.readFileSync('migrations/0008_water_reminder_window.sql','utf8'));
  for(const id of ids){await db.insert(schema.users).values({id});await db.insert(schema.meals).values({userId:id,day:0,mealType:'Lunch',name:'Custom '+id,calories:300,completed:true});await db.insert(schema.workouts).values({userId:id,day:0,name:'Walk '+id,completed:true});}
  assert.equal((await route.GET()).status,503);
  await engine.exec(fs.readFileSync('migrations/0001_plan_archives.sql','utf8'));

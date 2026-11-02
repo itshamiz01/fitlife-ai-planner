@@ -22,7 +22,7 @@ const profile=id=>({id,email:null,name:'Synthetic',isDemo:true,hasRecoveryKey:fa
 const ids=['00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002'];
 async function replace(reason='regenerate',fail=false) {return db.transaction(async tx=>{await tx.select().from(users).where(eq(users.id,ids[0])).for('update');await archiveAndReplacePlan(tx,profile(ids[0]),profile(ids[0]),reason);if(fail)throw Error('forced rollback');});}
 (async()=>{
-  await sql.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));
+  await sql.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));await sql.exec(fs.readFileSync('migrations/0008_water_reminder_window.sql','utf8'));
   for(const id of ids) {
     await db.insert(users).values({id});
     await db.insert(meals).values({userId:id,day:0,mealType:'Lunch',name:'Custom meal '+id,calories:300,completed:true});

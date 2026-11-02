@@ -1,3 +1,4 @@
+import { inReminderWindow } from "./hydration/reminder-window";
 /** Strict endpoint allowlist prevents users from making the server send to arbitrary URLs. */
 export function validPushEndpoint(value: unknown): value is string {
   if (typeof value !== "string" || value.length > 2048) return false;
@@ -15,9 +16,11 @@ export function validTimeZone(value: unknown): value is string {
   if (typeof value !== "string" || value.length > 100) return false;
   try { new Intl.DateTimeFormat("en", { timeZone: value }); return true; } catch { return false; }
 }
-export function isReminderTime(now: Date, timeZone: string) {
-  const hour = Number(new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", hourCycle: "h23" }).format(now));
-  return hour >= 8 && hour < 21;
+export function isReminderTime(now: Date, timeZone: string, start = 480, end = 1260) {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(now);
+  const hour = Number(parts.find(part => part.type === "hour")?.value);
+  const minute = Number(parts.find(part => part.type === "minute")?.value);
+  return inReminderWindow(hour * 60 + minute, start, end);
 }
 export function pushMessage(name: string) {
   const first = name.trim().split(/\s+/)[0]?.replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 40) || "there";

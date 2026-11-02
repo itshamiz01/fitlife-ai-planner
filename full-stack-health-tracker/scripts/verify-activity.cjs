@@ -21,7 +21,7 @@ server.getDashboardData = async id => ({user:{id,name:'Synthetic',email:null,isD
 const exportRoute=load('src/app/api/export/route.ts',{'next/server':{NextResponse:{json:(body,options={})=>({body,status:options.status||200,headers:options.headers})}},'@/db':{db},'@/db/schema':schema,'@/lib/server':server});
 const req=body=>({json:async()=>body});
 (async()=>{
- await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));
+ await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));await engine.exec(fs.readFileSync('migrations/0008_water_reminder_window.sql','utf8'));
  const ids=[current,'00000000-0000-4000-8000-000000000002'];
  for(const id of ids)await db.insert(schema.users).values({id});
  assert.equal((await route.GET()).status,503);

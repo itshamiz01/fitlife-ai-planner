@@ -11,7 +11,7 @@ const imports={'next/server':{NextResponse:{json:(body,options={})=>({body,statu
 const route=load('src/app/api/journal/route.ts',{...imports,'@/lib/journal-validation':validation}),exportRoute=load('src/app/api/export/route.ts',imports);
 const req=body=>({json:async()=>body}),get=kind=>({url:'http://example.test/api/journal?kind='+kind});
 (async()=>{
- await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));for(const id of ids)await db.insert(schema.users).values({id});
+ await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));await engine.exec(fs.readFileSync('migrations/0008_water_reminder_window.sql','utf8'));for(const id of ids)await db.insert(schema.users).values({id});
  assert.equal((await route.GET(get('food'))).status,503);assert.equal((await exportRoute.POST(req({}))).body.journalsAvailable,false);
  await engine.exec(fs.readFileSync('migrations/0004_personal_journals.sql','utf8'));
  const date=new Date().toISOString().slice(0,10);

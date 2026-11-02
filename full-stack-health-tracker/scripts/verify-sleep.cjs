@@ -20,7 +20,7 @@ const route=load('src/app/api/sleep/route.ts',{...imports,'@/lib/sleep-validatio
 const exportRoute=load('src/app/api/export/route.ts',imports);
 const req=body=>({json:async()=>body});
 (async()=>{
- await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));
+ await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));await engine.exec(fs.readFileSync('migrations/0008_water_reminder_window.sql','utf8'));
  for(const id of ids)await db.insert(schema.users).values({id});
  assert.equal((await route.GET()).status,503);
  assert.equal((await exportRoute.POST(req({}))).body.sleepAvailable,false);

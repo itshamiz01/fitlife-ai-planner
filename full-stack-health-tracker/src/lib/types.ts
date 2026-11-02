@@ -5,7 +5,7 @@ export type Profile = {
   foodBudgetPaise: number; budgetPeriod: string; experience: string; equipment: string;
   workoutMinutes: number; fitnessGoal: string;
   calorieTarget: number; waterTarget: number; activityTarget: number;
-  remindersEnabled: boolean; reminderInterval: number;
+  remindersEnabled: boolean; reminderInterval: number; reminderStartMinute: number; reminderEndMinute: number;
 };
 export type MealIngredient = {
   foodId: string; name: string; grams: number; state: string; costPaise: number;

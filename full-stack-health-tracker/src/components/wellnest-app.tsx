@@ -16,6 +16,7 @@ import type { DashboardData, View, Resource } from "@/lib/types";
 import { todayIndex, todayKey } from "@/lib/types";
 import { authJson, AuthRequestError, type AuthResult } from "@/lib/auth-client";
 import type { Profile } from "@/lib/types";
+import { localReminderTime } from "@/lib/hydration/reminder-window";
 
 const navItems = [
   { id: "dashboard" as View, label: "Overview", icon: LayoutDashboard },
@@ -138,11 +139,10 @@ export default function WellnestApp() {
   useEffect(() => {
     if (!data?.user.remindersEnabled) return;
     const timer = setInterval(() => {
-      const hour = new Date().getHours();
-      if (Date.now() >= nextReminder && hour >= 8 && hour < 21) { showReminder(); setNextReminder(Date.now() + data.user.reminderInterval * 60000); }
+      if (Date.now() >= nextReminder && localReminderTime(new Date(), data.user.reminderStartMinute, data.user.reminderEndMinute)) { showReminder(); setNextReminder(Date.now() + data.user.reminderInterval * 60000); }
     }, 15000);
     return () => clearInterval(timer);
-  }, [data?.user.remindersEnabled, data?.user.reminderInterval, nextReminder, showReminder]);
+  }, [data?.user.remindersEnabled, data?.user.reminderInterval, data?.user.reminderStartMinute, data?.user.reminderEndMinute, nextReminder, showReminder]);
 
   async function mutate(resource: Resource, method: "POST" | "PATCH" | "DELETE", values: Record<string, unknown>, success?: string) {
     if (!data || busy.current) return false;

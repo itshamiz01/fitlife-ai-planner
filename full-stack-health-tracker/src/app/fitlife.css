@@ -173,6 +173,9 @@ body::before {
 
 .water-alarm .reminder-amount { display: grid; gap: 5px; color: #324b3a; text-align: left; font-size: 13px; font-weight: 600; margin: 12px 0; }
 .water-alarm .reminder-amount input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #a9b8a9; border-radius: 9px; background: #fff; color: #203927; font: inherit; }
+.reminder-window-form { display: grid; gap: 10px; margin: 14px 0; }
+.reminder-window-form p { color: #415647; font-size: 12px; line-height: 1.5; }
+.reminder-window-form .btn { justify-self: start; }
 
 /* Clear, readable help guide using the app's existing glass surfaces. */
 .how-to-intro { display: flex; gap: 15px; padding: 22px; margin-bottom: 18px; align-items: flex-start; }

@@ -29,6 +29,8 @@ export const users = pgTable("wellnest_users", {
   activityTarget: integer("activity_target").notNull().default(60),
   remindersEnabled: boolean("reminders_enabled").notNull().default(false),
   reminderInterval: integer("reminder_interval").notNull().default(60),
+  reminderStartMinute: integer("reminder_start_minute").notNull().default(480),
+  reminderEndMinute: integer("reminder_end_minute").notNull().default(1260),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

@@ -18,7 +18,10 @@ export async function PATCH(request: Request) {
       const enabled = body.remindersEnabled ?? user.remindersEnabled;
       const interval = Math.round(number(body.reminderInterval ?? user.reminderInterval, "Reminder interval", 15, 180));
       const waterTarget = Math.round(number(body.waterTarget ?? user.waterTarget, "Daily water guide", 500, 4000));
-      await db.update(users).set({ remindersEnabled: enabled, reminderInterval: interval, waterTarget }).where(eq(users.id, user.id));
+      const start = number(body.reminderStartMinute ?? user.reminderStartMinute, "Reminder start", 0, 1439);
+      const end = number(body.reminderEndMinute ?? user.reminderEndMinute, "Reminder end", 0, 1439);
+      if (!Number.isInteger(start) || !Number.isInteger(end) || start === end) throw new ApiError("Choose different valid start and end times.");
+      await db.update(users).set({ remindersEnabled: enabled, reminderInterval: interval, reminderStartMinute: start, reminderEndMinute: end, waterTarget }).where(eq(users.id, user.id));
     } else {
       const age = Math.round(number(body.age, "Age", 5, 110));
       const goal = age < 18 ? "maintain" : choice(body.goal, ["lose", "gain", "maintain"], "weight goal");
@@ -42,7 +45,7 @@ export async function PATCH(request: Request) {
       await db.transaction(async tx => {
         const [fresh] = await tx.select().from(users).where(eq(users.id, user.id)).for("update");
         const changesPlan = profileChangesPlan(fresh, values);
-        const targets = changesPlan ? { ...recommendations(values), ...waterOverride } : waterOverride;
+        const targets = changesPlan ? { ...recommendations(values), waterTarget: fresh.waterTarget, ...waterOverride } : waterOverride;
         const resetBaseline = values.goal !== fresh.goal || values.targetWeight !== fresh.targetWeight || values.currentWeight !== fresh.currentWeight;
         const [updated] = await tx.update(users).set({ ...values, ...targets, startWeight: resetBaseline ? values.currentWeight : fresh.startWeight }).where(eq(users.id, user.id)).returning();
         if (values.currentWeight !== fresh.currentWeight) await tx.insert(weightLogs).values({ userId: user.id, weight: values.currentWeight, date: new Date().toISOString().slice(0, 10), note: "A fresh profile check-in" });

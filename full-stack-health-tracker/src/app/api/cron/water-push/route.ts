@@ -19,12 +19,12 @@ export async function POST(request: Request) {
   try {
     webpush.setVapidDetails(config.subject, config.publicKey, config.privateKey);
     const now = new Date();
-    const due = await db.select({ subscription: waterPushSubscriptions, name: users.name, interval: users.reminderInterval }).from(waterPushSubscriptions).innerJoin(users, eq(users.id, waterPushSubscriptions.userId)).where(and(eq(users.remindersEnabled,true), lte(waterPushSubscriptions.nextDue,now))).orderBy(asc(waterPushSubscriptions.nextDue)).limit(20);
+    const due = await db.select({ subscription: waterPushSubscriptions, name: users.name, interval: users.reminderInterval, start: users.reminderStartMinute, end: users.reminderEndMinute }).from(waterPushSubscriptions).innerJoin(users, eq(users.id, waterPushSubscriptions.userId)).where(and(eq(users.remindersEnabled,true), lte(waterPushSubscriptions.nextDue,now))).orderBy(asc(waterPushSubscriptions.nextDue)).limit(20);
     let attempted = 0, accepted = 0, expired = 0, failed = 0;
     async function deliver(row: typeof due[number]) {
       const interval = Math.max(15, Math.min(180, row.interval));
       let activeHours = false;
-      try { activeHours = isReminderTime(now, row.subscription.timeZone); } catch { failed++; }
+      try { activeHours = isReminderTime(now, row.subscription.timeZone, row.start, row.end); } catch { failed++; }
       const nextDue = new Date(now.getTime() + (activeHours ? interval : 15) * 60000);
       // Atomic lease: competing scheduler invocations cannot send the same due event.
       // A process crash after this claim can miss one reminder, rather than duplicate it.

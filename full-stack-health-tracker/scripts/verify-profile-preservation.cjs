@@ -45,5 +45,6 @@ async function run(changes) {user={...base};actions=[];await PATCH({json:async()
   assert.equal(calls.filter(([op])=>op==='archive').length,1);
   assert.equal(calls.find(([op])=>op==='archive')[3], 'profile-change');
   assert.equal(user.calorieTarget,2000);
+  user={...base}; actions=[]; const changed=body({diet:'vegan'}); delete changed.waterTarget; await PATCH({json:async()=>changed}); assert.equal(user.waterTarget,2500,'profile changes must not recompute water target');
   console.log('Profile preservation checks passed with database stub; PostgreSQL integration not tested.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

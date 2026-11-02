@@ -8,7 +8,7 @@ class ApiError extends Error{constructor(message,status=400){super(message);this
 const server={ApiError,checkOrigin(){if(!origin)throw new ApiError('blocked',403)},async requireUser(){if(!authorized)throw new ApiError('unauthorized',401);return {id:current}},apiError(e){return {status:e.status||500,body:{error:e.message}}}};
 const route=load('src/app/api/groceries/route.ts',{'next/server':{NextResponse:{json:(body,options={})=>({body,status:options.status||200,headers:options.headers})}},'@/db':{db},'@/db/schema':schema,'@/lib/server':server});
 const req=body=>({json:async()=>body});
-(async()=>{await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));for(const id of ids)await db.insert(schema.users).values({id});
+(async()=>{await engine.exec(fs.readFileSync('scripts/fixtures/pre-archive-schema.sql','utf8'));await engine.exec(fs.readFileSync('migrations/0008_water_reminder_window.sql','utf8'));for(const id of ids)await db.insert(schema.users).values({id});
 assert.equal((await route.GET()).status,503);await engine.exec(fs.readFileSync('migrations/0005_grocery_purchases.sql','utf8'));await engine.exec(fs.readFileSync('migrations/0005_grocery_purchases.sql','utf8'));
 assert.equal((await route.GET()).body.entry,null);assert.equal((await route.PUT(req({listSignature:'week-1',purchasedKeys:['a','a','b']}))).status,200);assert.deepEqual((await route.GET()).body.entry.purchasedKeys,['a','b']);
 current=ids[1];assert.equal((await route.GET()).body.entry,null);assert.equal((await route.PUT(req({listSignature:'other',purchasedKeys:['c']}))).status,200);current=ids[0];assert.equal((await route.GET()).body.entry.listSignature,'week-1');
