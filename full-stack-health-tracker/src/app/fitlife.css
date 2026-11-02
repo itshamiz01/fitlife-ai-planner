@@ -194,3 +194,16 @@ body::before {
 .how-to-note svg { flex: none; color: #3c714a; margin-top: 3px; }
 .how-to-content .btn { justify-self: start; }
 @media (max-width: 520px) { .how-to-intro { padding: 17px; } .how-to-item summary { padding: 16px; font-size: 14px; } .how-to-content { padding: 0 16px 16px; } }
+
+/* Read-only exercise reference, separate from the development workout draft. */
+.exercise-reference { padding: 22px; margin: 18px 0; }
+.exercise-reference p, .exercise-reference li { font-size: 14px; color: #324a39; line-height: 1.65; }
+.exercise-reference > p { margin-bottom: 14px; }
+.exercise-reference-content, .exercise-reference-list, .exercise-reference-card > div { display: grid; gap: 12px; margin-top: 15px; }
+.exercise-reference-content > .btn { justify-self: start; }
+.exercise-reference-card { border: 1px solid rgba(100,135,100,.3); border-radius: 12px; background: rgba(255,255,255,.58); overflow: hidden; }
+.exercise-reference-card summary { padding: 14px; font-weight: 650; color: #264b32; cursor: pointer; }
+.exercise-reference-card > div { padding: 0 14px 15px; }
+.exercise-reference-card ol { list-style: decimal; padding-left: 22px; }
+.exercise-reference-card h3 { color: #264b32; font-size: 15px; font-weight: 650; }
+@media (max-width: 520px) { .exercise-reference { padding: 16px; } }
