@@ -173,3 +173,21 @@ body::before {
 
 .water-alarm .reminder-amount { display: grid; gap: 5px; color: #324b3a; text-align: left; font-size: 13px; font-weight: 600; margin: 12px 0; }
 .water-alarm .reminder-amount input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #a9b8a9; border-radius: 9px; background: #fff; color: #203927; font: inherit; }
+
+/* Clear, readable help guide using the app's existing glass surfaces. */
+.how-to-intro { display: flex; gap: 15px; padding: 22px; margin-bottom: 18px; align-items: flex-start; }
+.how-to-icon { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border-radius: 13px; color: #345f3e; background: #e0eddf; }
+.how-to-intro h2 { color: #263f2c; font-size: 19px; font-weight: 650; margin-bottom: 5px; }
+.how-to-intro p, .how-to-content p, .how-to-content li { color: #334c39; font-size: 14px; line-height: 1.7; }
+.how-to-list { display: grid; gap: 10px; }
+.how-to-item { overflow: hidden; }
+.how-to-item summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; color: #263f2c; font-size: 15px; font-weight: 650; cursor: pointer; list-style: none; }
+.how-to-item summary::-webkit-details-marker { display: none; }
+.how-to-item summary:focus-visible { outline: 3px solid #4b8054; outline-offset: -3px; }
+.how-to-item[open] summary svg { transform: rotate(90deg); }
+.how-to-content { padding: 0 20px 20px; display: grid; gap: 14px; }
+.how-to-content ol { list-style: decimal; padding-left: 22px; display: grid; gap: 7px; }
+.how-to-note { display: flex; align-items: flex-start; gap: 10px; background: rgba(230, 240, 226, .8); padding: 12px; border-radius: 12px; }
+.how-to-note svg { flex: none; color: #3c714a; margin-top: 3px; }
+.how-to-content .btn { justify-self: start; }
+@media (max-width: 520px) { .how-to-intro { padding: 17px; } .how-to-item summary { padding: 16px; font-size: 14px; } .how-to-content { padding: 0 16px 16px; } }
