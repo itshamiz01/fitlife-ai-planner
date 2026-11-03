@@ -11,3 +11,16 @@ No migration or database write is introduced. To roll back, remove the read-only
 ## Exercise reference expansion
 
 Sixteen lower-body and weighted-movement descriptions and suggested YouTube links have been added to the reference, bringing its total to 52. These additions are kept separate from the personalized workout draft and are not automatically assigned to any plan. The remaining requested chest, shoulder, arm, back, core, balance, cardio, mobility and band exercises have not yet been added. The new links are matched using indexed titles/descriptions, not by watching; availability, exercise variant and safety are unverified. The text itself also has not been professionally reviewed. No migration or existing-plan change is introduced. Roll back this stage by removing `src/lib/exercise-reference-additions.ts` and its reference-component import and rendering changes; existing records remain intact. `scripts/verify-exercise-reference-additions.cjs` checks data completeness and link shape, not video content. Lint, typecheck and a production build were run; browser and authenticated-production tests have not been run for this expansion.
+
+## Upper-body expansion
+
+Sixteen chest, shoulder and arm exercise descriptions and suggested YouTube links are added to the reference. The original 52 remain available. These cards are not included in the development workout generator or saved plans. Bench press, dips and overhead movements have specific equipment and safety notes; the descriptions do not establish personal suitability. Links are title/snippet matches only; neither the videos nor the descriptions have been reviewed by an exercise professional. The back, core, balance, cardio, mobility and band entries were added in subsequent stages. No database migration or existing records are changed. Roll back these new entries by removing the upper-body additions from `src/lib/exercise-reference-additions.ts` and reverting corresponding test counts. This stage does not change stored plans.
+
+
+## Core, balance, cardio, mobility and band expansion
+
+Twenty-nine more educational descriptions and suggested video links bring the reference to 108 entries. These remain separate from workout plans and include stop-for-pain and equipment safety information. Links were matched from indexed titles and snippets, not watched; exact video content and availability are unverified, as are the descriptions. The safety screen remains unchanged and is not clinical clearance. This expansion does not generate or change plans or require a database migration. Rollback: remove these additions and restore test counts; existing records remain untouched. The expansion has not received professional or real-device review.
+
+## Back expansion
+
+Eleven additional back exercise references and unreviewed suggested video links are included. Safety, content and video availability remain unverified. These are not assigned to workout plans.
