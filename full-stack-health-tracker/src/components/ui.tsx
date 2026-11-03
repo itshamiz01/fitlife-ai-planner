@@ -1,10 +1,12 @@
 "use client";
+import Image from "next/image";
+import { weightChartBounds } from "@/lib/weight-progress";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X, Plus, Leaf, Droplets, Check, ArrowUpRight, LoaderCircle, Pencil, Trash2, ChevronRight } from "lucide-react";
 import type { Meal, WeightLog } from "@/lib/types";
 
 export function Brand({ small = false }: { small?: boolean }) {
-  return <span className={`brand ${small ? "brand-small" : ""}`}><span className="brand-mark"><Leaf size={22} strokeWidth={2.1} /></span><span className="brand-wordmark">Fit Life <strong>Bro</strong></span></span>;
+  return <span className={`brand ${small ? "brand-small" : ""}`}><span className="brand-mark"><Image src="/icons/icon-192-dual-leaf.png" alt="" width={33} height={33} /></span><span className="brand-wordmark">Fit Life <strong>Bro</strong></span></span>;
 }
 export function Button({ children, className = "", variant = "primary", loading = false, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost" | "danger"; loading?: boolean }) {
   return <button className={`btn btn-${variant} ${className}`} {...props} disabled={loading || props.disabled}>{loading && <LoaderCircle className="spin" size={16} />}{children}</button>;
@@ -53,8 +55,7 @@ export function WeightChart({ logs, target, compact = false }: { logs: WeightLog
   const [hover, setHover] = useState<number | null>(null);
   const sorted = [...logs].sort((a, b) => a.date.localeCompare(b.date));
   if (sorted.length === 0) return <div className="chart-empty">Your first check-in is the beginning of your story.</div>;
-  const min = Math.floor(Math.min(...sorted.map(log => log.weight), target)) - 1;
-  const max = Math.ceil(Math.max(...sorted.map(log => log.weight))) + 1;
+  const { min, max } = weightChartBounds(sorted.map(log => log.weight), target);
   const width = 600, height = compact ? 155 : 240, left = 36, right = 15, top = 20, bottom = 29;
   const x = (i: number) => left + i / Math.max(1, sorted.length - 1) * (width - left - right);
   const y = (weight: number) => top + (max - weight) / (max - min) * (height - top - bottom);

@@ -14,7 +14,7 @@ let api;
   const manifest = await response.json();
   assert.equal(manifest.short_name, 'Fit Life Bro'); assert.equal(manifest.display, 'standalone'); assert.equal(manifest.scope, '/'); assert.equal(manifest.id, '/');
   assert.ok(manifest.start_url.startsWith('/')); assert.ok(manifest.icons.some(icon => icon.sizes === '192x192')); assert.ok(manifest.icons.some(icon => icon.sizes === '512x512' && icon.purpose === 'maskable'));
-  for (const icon of [...manifest.icons, { src: '/icons/apple-touch-icon.png', sizes: '180x180' }]) {
+  for (const icon of [...manifest.icons, { src: '/icons/apple-touch-icon-dual-leaf.png', sizes: '180x180' }]) {
     const image = await api.get(icon.src); assert.equal(image.status(), 200); const buffer = await image.body();
     assert.equal(buffer.subarray(1, 4).toString(), 'PNG'); const [width, height] = icon.sizes.split('x').map(Number); assert.equal(buffer.readUInt32BE(16), width); assert.equal(buffer.readUInt32BE(20), height);
   }
@@ -30,7 +30,7 @@ let api;
   assert.equal(await page.locator('meta[name="mobile-web-app-capable"]').getAttribute('content'), 'yes');
   assert.equal(await page.locator('meta[name="apple-mobile-web-app-title"]').getAttribute('content'), 'Fit Life Bro');
   assert.equal(await page.locator('meta[name="theme-color"]').getAttribute('content'), '#3d7046');
-  assert.equal(await page.locator('link[rel="apple-touch-icon"]').getAttribute('href'), '/icons/apple-touch-icon.png');
+  assert.equal(await page.locator('link[rel="apple-touch-icon"]').getAttribute('href'), '/icons/apple-touch-icon-dual-leaf.png');
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), undefined, { timeout: 20000 });
   const sw = await page.evaluate(async () => { const registration = await navigator.serviceWorker.ready; return { scope: registration.scope, state: registration.active?.state }; });
   assert.equal(sw.state, 'activated'); assert.equal(new URL(sw.scope).pathname, '/');
