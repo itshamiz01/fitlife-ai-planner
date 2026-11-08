@@ -28,6 +28,8 @@ export const users = pgTable("wellnest_users", {
   waterTarget: integer("water_target").notNull().default(2500),
   activityTarget: integer("activity_target").notNull().default(60),
   remindersEnabled: boolean("reminders_enabled").notNull().default(false),
+  mealRemindersEnabled: boolean("meal_reminders_enabled").notNull().default(true),
+  workoutRemindersEnabled: boolean("workout_reminders_enabled").notNull().default(true),
   reminderInterval: integer("reminder_interval").notNull().default(60),
   reminderStartMinute: integer("reminder_start_minute").notNull().default(480),
   reminderEndMinute: integer("reminder_end_minute").notNull().default(1260),
@@ -178,3 +180,14 @@ export const waterReminderConfirmations = pgTable("fitlife_water_reminder_confir
   amount: integer("amount").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, table => [primaryKey({ columns: [table.userId, table.requestId] })]);
+
+// One row per meal/workout notification actually claimed for sending, per device
+// and local date. The primary key is the deduplication guard for the scheduler.
+export const planPushSends = pgTable("fitlife_plan_push_sends", {
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  subscriptionId: uuid("subscription_id").notNull().references(() => waterPushSubscriptions.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  itemId: uuid("item_id").notNull(),
+  localDate: text("local_date").notNull(),
+  sentAt: timestamp("sent_at", { withTimezone: true }).defaultNow().notNull(),
+}, table => [primaryKey({ columns: [table.subscriptionId, table.kind, table.itemId, table.localDate] })]);

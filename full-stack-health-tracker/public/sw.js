@@ -1,6 +1,6 @@
 /* Fit Life Bro caches public assets only. Health records, sessions, API responses,
    and online HTML pages must always come from the server. */
-const CACHE_NAME = "fitlife-public-v3";
+const CACHE_NAME = "fitlife-public-v4";
 const OFFLINE_PAGE = "/offline.html";
 const PUBLIC_SHELL = [OFFLINE_PAGE, "/icons/icon-192-dual-leaf.png", "/icons/icon-512-dual-leaf.png", "/icons/apple-touch-icon-dual-leaf.png"];
 
@@ -42,20 +42,37 @@ self.addEventListener("fetch", event => {
 });
 
 // Web Push is only available when a subscription and server scheduler are configured.
+const UUID_V4 = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 self.addEventListener("push", event => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; } catch { /* Use a safe generic message. */ }
+  const kind = payload.kind === "meal" || payload.kind === "workout" ? payload.kind : "water";
+  if (kind !== "water") {
+    const title = typeof payload.title === "string" ? payload.title.slice(0, 100) : "Fit Life Bro reminder";
+    const body = typeof payload.body === "string" ? payload.body.slice(0, 200) : "You have something planned now. Open Fit Life Bro to see it.";
+    const url = kind === "meal" ? "/?view=meals" : "/?view=workouts";
+    const tag = typeof payload.tag === "string" && /^[a-z0-9-]{1,64}$/i.test(payload.tag) ? payload.tag : "fitlife-plan-push";
+    event.waitUntil(self.registration.showNotification(title, { body, icon: "/icons/icon-192-dual-leaf.png", badge: "/icons/icon-192-dual-leaf.png", tag, data: { url } }));
+    return;
+  }
   const title = typeof payload.title === "string" ? payload.title.slice(0, 100) : "Time for a water break 💧";
-  const reminderId = typeof payload.reminderId === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(payload.reminderId) ? payload.reminderId : null;
+  const reminderId = typeof payload.reminderId === "string" && UUID_V4.test(payload.reminderId) ? payload.reminderId : null;
   const body = typeof payload.body === "string" ? payload.body.slice(0, 200) : "Take a water break if you need one.";
   event.waitUntil(self.registration.showNotification(title, { body, icon: "/icons/icon-192-dual-leaf.png", badge: "/icons/icon-192-dual-leaf.png", tag: "fitlife-water-push", actions: [{ action: "confirm-water", title: "I drank water" }], data: { reminderId } }));
 });
 self.addEventListener("notificationclick", event => {
   event.notification.close();
   event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async clients => {
+    const planUrl = event.notification.data?.url;
+    if (planUrl === "/?view=meals" || planUrl === "/?view=workouts") {
+      const url = new URL(planUrl, self.location.origin).href;
+      const existing = clients.find(client => new URL(client.url).origin === self.location.origin);
+      if (existing) { await existing.navigate(url); return existing.focus(); }
+      return self.clients.openWindow(url);
+    }
     const destination = new URL("/?view=water&reminder=confirm", self.location.origin);
     const reminderId = event.notification.data?.reminderId;
-    if (typeof reminderId === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(reminderId)) destination.searchParams.set("reminderId", reminderId);
+    if (typeof reminderId === "string" && UUID_V4.test(reminderId)) destination.searchParams.set("reminderId", reminderId);
     const url = destination.href;
     const existing = clients.find(client => new URL(client.url).origin === self.location.origin);
     if (existing) { await existing.navigate(url); return existing.focus(); }
