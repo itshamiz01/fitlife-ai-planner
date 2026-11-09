@@ -207,3 +207,8 @@ body::before {
 .exercise-reference-card ol { list-style: decimal; padding-left: 22px; }
 .exercise-reference-card h3 { color: #264b32; font-size: 15px; font-weight: 650; }
 @media (max-width: 520px) { .exercise-reference { padding: 16px; } }
+/* Keep header popovers above glass panels (backdrop filters create stacking contexts).
+   Dialogs and the mobile navigation retain their higher stacking levels. */
+.topbar { position: relative; z-index: 40; }
+.account-popover, .notification-popover { max-width: calc(100vw - 32px); max-height: calc(100dvh - 100px); overflow-y: auto; }
+@media (max-width: 600px) { .notification-popover { right: -38px; } }
