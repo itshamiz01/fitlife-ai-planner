@@ -13,3 +13,202 @@
 /* Keep factual answers, cost warnings and source links comfortably readable. */
 .coach-message-bubble{font-size:12.5px;color:#617653}.from-user .coach-message-bubble{color:#5d744c}.coach-message-sources>a{font-size:8px;min-height:25px;padding:4px 6px;color:#607749}.coach-message-sources>span:first-child{font-size:8px;color:#80936d}.coach-mode-badge{font-size:9px;color:#6a8452}.coach-composer-note{font-size:9px;color:#859875}.coach-composer-note>span:last-child{font-size:8px;color:#a0af91}.coach-input-row textarea{font-size:13px}.coach-input-row textarea::placeholder{font-size:12px}.coach-context-card dd{font-size:11px;color:#627c4d}.coach-trust-card p{color:#72875e}.coach-trust-card .coach-trust-note{font-size:9px;color:#81936d}.meal-cost-badge{color:#856d40}.budget-warning p{color:#856b3f}.budget-warning strong{color:#7d6236}
 @media(max-width:520px){.coach-message-bubble{font-size:11.5px;line-height:1.95}.coach-message-sources>a{font-size:8px;min-height:25px;padding:4px 6px}.coach-mode-badge{font-size:8px}.coach-composer-note{font-size:8px;line-height:1.9}.coach-input-row textarea{font-size:16px}.coach-input-row textarea::placeholder{font-size:11px}.coach-context-card dd{font-size:11px}.coach-trust-card .coach-trust-note{font-size:9px}.meal-compact .meal-cost-badge{font-size:7px}}
+
+/* Recipe library: mobile-first, no motion required. */
+.recipe-library-hero{position:relative;overflow:hidden;border-radius:18px;min-height:240px;background:#e8efe4;display:flex;align-items:center;margin-bottom:20px}
+.recipe-library-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42}.recipe-library-hero>div{position:relative;padding:28px;max-width:460px;background:linear-gradient(90deg,#edf4eafa,#edf4ead9,transparent)}.recipe-library-hero h2{font-size:28px;color:#365832;margin:10px 0}.recipe-library-hero p{line-height:1.6;color:#506b50}.recipe-library-hero span{font-size:11px;letter-spacing:1px;color:#557752}
+.recipe-library-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}.recipe-library-filters label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#496647}.recipe-library-filters input,.recipe-library-filters select,.recipe-guide select{width:100%;border:1px solid #d8e5d5;background:white;border-radius:8px;padding:9px;color:#314c35}.recipe-library-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:18px 0}.recipe-library-card{text-align:left;background:white;border:1px solid #e0e9dc;border-radius:14px;overflow:hidden;cursor:pointer}.recipe-library-card:hover,.recipe-library-card:focus-visible{outline:2px solid #6b986d;outline-offset:2px}.recipe-library-card img{width:100%;height:150px;object-fit:cover}.recipe-library-copy{display:flex;flex-direction:column;gap:8px;padding:14px;color:#38583b}.recipe-library-copy small{line-height:1.4;color:#738971}.recipe-guide{display:flex;flex-direction:column;gap:12px;line-height:1.6}.recipe-guide ol{list-style:decimal;padding-left:24px}.recipe-guide li{padding:3px 0}.recipe-guide h3{font-size:15px;color:#38583b;font-weight:600}.recipe-guide table{width:100%}
+
+/* Botanical glass surfaces: the contrast layer stays opaque enough for readable text. */
+body { background: #f3f1e9 url('/images/glass-leaves.svg') center top / cover fixed no-repeat; }
+.workspace { background: transparent; }
+.sidebar, .topbar { background: rgba(253, 254, 251, .92); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.panel, .stat-card, .meal-card, .workout-card { background-color: rgba(255, 255, 252, .88); border-color: rgba(220, 229, 217, .95); box-shadow: 0 8px 28px rgba(44, 65, 45, .06); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+/* Preserve the intentionally blue water panel and dark goal card. */
+.water-hero { background-color: rgba(239, 248, 252, .91); }
+.brand-wordmark strong { font-family: "Brush Script MT", "Segoe Script", cursive; font-style: italic; font-weight: 600; letter-spacing: -.7px; color: #739064; }
+.topbar-brand { display: none; }
+@media (max-width: 900px) {
+  .topbar { position: relative; min-height: 76px; }
+  .topbar-left, .topbar-actions { position: relative; z-index: 1; }
+  .topbar-left .breadcrumb-current { display: none; }
+  .topbar-brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #2b4730; white-space: nowrap; font-size: 18px; line-height: 1; font-weight: 750; letter-spacing: -.7px; }
+  .topbar-brand .brand-wordmark { font-size: 17px; }
+  .topbar-brand small { color: #758471; font-size: 10px; font-weight: 500; letter-spacing: 0; }
+}
+@media (max-width: 520px) {
+  .topbar { padding-left: 16px; padding-right: 16px; }
+  .topbar-brand { font-size: 17px; }
+  .topbar-actions { gap: 9px; }
+  .topbar-actions .demo-pill { display: none; }
+  .topbar-sign-in { font-size: 9px; }
+}
+@media (max-width: 360px) {
+  .topbar-brand .brand-wordmark { font-size: 15px; }
+  .topbar-actions { gap: 4px; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .sidebar, .topbar, .panel, .stat-card, .meal-card, .workout-card { backdrop-filter: none; -webkit-backdrop-filter: none; background-color: #fff; }
+  .water-hero { background-color: #f4f9fc; }
+}
+@media (max-width: 520px) {
+  /* Keep demo sign-in reachable on narrow screens without covering the centered brand. */
+  .topbar:has(.topbar-sign-in) { height: 104px; align-items: flex-start; padding-top: 19px; }
+  .topbar:has(.topbar-sign-in) .topbar-brand { top: 33px; }
+  .topbar-actions:has(.topbar-sign-in) .topbar-sign-in { position: absolute; top: 43px; right: 0; }
+}
+@media (max-width: 900px) {
+  .topbar-actions .demo-pill, .topbar-account > span:nth-child(2), .topbar-account > svg { display: none; }
+}
+
+/* Approved dual-leaf artwork is already tilted; do not rotate it again. */
+.brand-mark{overflow:hidden;transform:none}.brand-mark img{width:100%;height:100%;object-fit:cover}
+
+/* Visible hanging fronds: size to viewport width rather than cover, so mobile
+   doesn't crop away the sides of the artwork. Panels remain legible. */
+body {
+  background-color: #e9e5d8;
+  background-image: url('/images/glass-leaves.svg'), linear-gradient(145deg, #e8d9ca 0%, #e8e9d8 45%, #d9e4d0 100%);
+  background-size: min(100%, 900px) auto, 100% 100%;
+  background-position: center top, center;
+  background-repeat: repeat-y, no-repeat;
+  background-attachment: scroll, fixed;
+}
+.panel, .stat-card, .meal-card, .workout-card {
+  background-color: rgba(255, 254, 248, .72);
+  border-color: rgba(255, 255, 255, .78);
+  box-shadow: 0 12px 32px rgba(54, 69, 45, .10), inset 0 1px 0 rgba(255,255,255,.75);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.sidebar, .topbar { background: rgba(253, 252, 245, .88); }
+.water-hero { background-color: rgba(239, 248, 252, .83); }
+@media (prefers-reduced-transparency: reduce) {
+  .sidebar, .topbar, .panel, .stat-card, .meal-card, .workout-card { background-color: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .water-hero { background-color: #f4f9fc; }
+}
+
+/* Real trailing vines stay in the background as the page scrolls. */
+body {
+  position: relative;
+  isolation: isolate;
+  background: #e9e5d8;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #f1eee5 url('/images/sparse-vines-revision.webp') center top / cover no-repeat;
+}
+.panel, .stat-card, .meal-card, .workout-card {
+  background-color: rgba(255, 254, 248, .81);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .panel, .stat-card, .meal-card, .workout-card { background-color: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+.page-heading {
+  padding: 13px 16px;
+  border: 1px solid rgba(255,255,255,.58);
+  border-radius: 14px;
+  background: rgba(255, 254, 248, .72);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .page-heading { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* Organic glassmorphism: frosted surfaces over the hanging real leaves. */
+.page-heading, .panel, .stat-card, .meal-card, .workout-card, .recipe-library-card {
+  background-color: rgba(255, 253, 245, .68);
+  border: 1px solid rgba(255, 255, 255, .72);
+  box-shadow: 0 10px 30px rgba(52, 67, 46, .13), inset 0 1px 0 rgba(255,255,255,.72);
+  -webkit-backdrop-filter: blur(15px) saturate(120%);
+  backdrop-filter: blur(15px) saturate(120%);
+}
+.goal-card, .budget-plan-banner {
+  background: rgba(34, 76, 53, .92);
+  border: 1px solid rgba(224, 239, 217, .3);
+  box-shadow: 0 12px 30px rgba(32, 65, 45, .17), inset 0 1px 0 rgba(255,255,255,.15);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.water-hero { background-color: rgba(239, 248, 252, .78); }
+@media (prefers-reduced-transparency: reduce) {
+  .page-heading, .panel, .stat-card, .meal-card, .workout-card, .recipe-library-card { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .goal-card, .budget-plan-banner { background: #264d36; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .water-hero { background: #f4f9fc; }
+}
+
+/* Airy frosted cards, with a clear fallback when translucency is disabled. */
+.page-heading, .panel, .stat-card, .meal-card, .workout-card, .recipe-library-card { border-radius: 16px; }
+.sidebar, .topbar { background: rgba(251, 250, 244, .75); -webkit-backdrop-filter: blur(18px) saturate(115%); backdrop-filter: blur(18px) saturate(115%); }
+@media (prefers-reduced-transparency: reduce) { .sidebar, .topbar { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; } }
+
+/* Optional body screening is separate from the editable profile form. */
+.body-assessment { padding: 22px; margin-bottom: 20px; }
+.body-assessment-content { display: grid; gap: 16px; margin-top: 16px; }
+.body-assessment-content > p, .body-assessment-results p { color: #415647; font-size: 14px; line-height: 1.6; }
+.body-assessment-content > .btn { justify-self: start; }
+.body-assessment-results { display: grid; gap: 12px; }
+.body-assessment-results dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.body-assessment-results dl div { padding: 12px; border-radius: 12px; background: rgba(255,255,255,.62); }
+.body-assessment-results dt { color: #516554; font-size: 12px; }
+.body-assessment-results dd { color: #253c2c; font-weight: 650; margin-top: 4px; overflow-wrap: anywhere; }
+.body-assessment-results a { color: #285f3a; text-decoration: underline; }
+@media (max-width: 520px) { .body-assessment { padding: 16px; } .body-assessment-results dl { grid-template-columns: 1fr; } }
+
+/* Optional hydration guidance does not alter saved water goals or history. */
+.hydration-estimate { padding: 22px; margin: 20px 0; }
+.hydration-estimate form, .hydration-estimate-result { display: grid; gap: 14px; margin-top: 16px; }
+.hydration-estimate p { font-size: 14px; line-height: 1.6; color: #344e42; }
+.hydration-estimate form > .btn { justify-self: start; }
+.hydration-estimate-result { border-top: 1px solid rgba(90, 122, 100, .25); padding-top: 14px; }
+.hydration-estimate-result a { color: #285f3a; text-decoration: underline; }
+@media (max-width: 520px) { .hydration-estimate { padding: 16px; } }
+
+.water-alarm .reminder-amount { display: grid; gap: 5px; color: #324b3a; text-align: left; font-size: 13px; font-weight: 600; margin: 12px 0; }
+.water-alarm .reminder-amount input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #a9b8a9; border-radius: 9px; background: #fff; color: #203927; font: inherit; }
+.reminder-window-form { display: grid; gap: 10px; margin: 14px 0; }
+.reminder-window-form p { color: #415647; font-size: 12px; line-height: 1.5; }
+.reminder-window-form .btn { justify-self: start; }
+
+/* Clear, readable help guide using the app's existing glass surfaces. */
+.how-to-intro { display: flex; gap: 15px; padding: 22px; margin-bottom: 18px; align-items: flex-start; }
+.how-to-icon { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border-radius: 13px; color: #345f3e; background: #e0eddf; }
+.how-to-intro h2 { color: #263f2c; font-size: 19px; font-weight: 650; margin-bottom: 5px; }
+.how-to-intro p, .how-to-content p, .how-to-content li { color: #334c39; font-size: 14px; line-height: 1.7; }
+.how-to-list { display: grid; gap: 10px; }
+.how-to-item { overflow: hidden; }
+.how-to-item summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; color: #263f2c; font-size: 15px; font-weight: 650; cursor: pointer; list-style: none; }
+.how-to-item summary::-webkit-details-marker { display: none; }
+.how-to-item summary:focus-visible { outline: 3px solid #4b8054; outline-offset: -3px; }
+.how-to-item[open] summary svg { transform: rotate(90deg); }
+.how-to-content { padding: 0 20px 20px; display: grid; gap: 14px; }
+.how-to-content ol { list-style: decimal; padding-left: 22px; display: grid; gap: 7px; }
+.how-to-note { display: flex; align-items: flex-start; gap: 10px; background: rgba(230, 240, 226, .8); padding: 12px; border-radius: 12px; }
+.how-to-note svg { flex: none; color: #3c714a; margin-top: 3px; }
+.how-to-content .btn { justify-self: start; }
+@media (max-width: 520px) { .how-to-intro { padding: 17px; } .how-to-item summary { padding: 16px; font-size: 14px; } .how-to-content { padding: 0 16px 16px; } }
+
+/* Read-only exercise reference, separate from the development workout draft. */
+.exercise-reference { padding: 22px; margin: 18px 0; }
+.exercise-reference p, .exercise-reference li { font-size: 14px; color: #324a39; line-height: 1.65; }
+.exercise-reference > p { margin-bottom: 14px; }
+.exercise-reference-content, .exercise-reference-list, .exercise-reference-card > div { display: grid; gap: 12px; margin-top: 15px; }
+.exercise-reference-content > .btn { justify-self: start; }
+.exercise-reference-card { border: 1px solid rgba(100,135,100,.3); border-radius: 12px; background: rgba(255,255,255,.58); overflow: hidden; }
+.exercise-reference-card summary { padding: 14px; font-weight: 650; color: #264b32; cursor: pointer; }
+.exercise-reference-card > div { padding: 0 14px 15px; }
+.exercise-reference-card ol { list-style: decimal; padding-left: 22px; }
+.exercise-reference-card h3 { color: #264b32; font-size: 15px; font-weight: 650; }
+@media (max-width: 520px) { .exercise-reference { padding: 16px; } }
+/* Keep header popovers above glass panels (backdrop filters create stacking contexts).
+   Dialogs and the mobile navigation retain their higher stacking levels. */
+.topbar { position: relative; z-index: 40; }
+.account-popover, .notification-popover { max-width: calc(100vw - 32px); max-height: calc(100dvh - 100px); overflow-y: auto; }
+@media (max-width: 600px) { .notification-popover { right: -38px; } }

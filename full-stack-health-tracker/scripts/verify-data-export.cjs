@@ -1,0 +1,33 @@
+/* Route tests with mocked persistence; not a live isolation or browser test. */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ts = require('typescript');
+const code = ts.transpileModule(fs.readFileSync('src/app/api/export/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+let signedIn = true, originAllowed = true, selectedUser, missingArchives = false;
+const coachMessages = Object.fromEntries(['id','role','content','sources','mode','createdAt','userId'].map(k=>[k,k]));
+const planArchives = Object.fromEntries(['id','reason','snapshot','createdAt','userId'].map(k=>[k,k]));
+const activityLogs = Object.fromEntries(['id','userId','date','createdAt'].map(k=>[k,k]));
+const sleepLogs = Object.fromEntries(['id','userId','endedAt','createdAt'].map(k=>[k,k]));
+const groceryPurchases = Object.fromEntries(['userId','listSignature','purchasedKeys','updatedAt'].map(k=>[k,k]));
+const journalEntries = Object.fromEntries(['id','userId','date','createdAt'].map(k=>[k,k]));
+const db = {select(selection = {}) {assert.equal('userId' in selection,false); return {from(){return {where(condition){selectedUser=condition[1];if(selection.listSignature)return Promise.resolve([{listSignature:'week',purchasedKeys:['item'],updatedAt:new Date()}]);return {async orderBy(){if (selection.reason && missingArchives) throw {cause:{code:'42P01'}}; return [{id:'m1',role:'user',content:'hello',sources:[],mode:'user',createdAt:new Date('2026-01-01T00:00:00Z')}];}};}};}};}};
+const user = {id:'user-a',name:'Test',email:'test@example.test',isDemo:false,passwordHash:'secret-password-hash',recoveryKeyHash:'secret-recovery-hash',futureSecret:'secret-future-value'};
+const data = {user,meals:[{id:'meal-a',userId:'user-a'}],workouts:[],waterLogs:[],weightLogs:[]};
+const server = {checkOrigin(){if (!originAllowed) throw Error('origin blocked');},async requireUser(){if (!signedIn) throw Error('unauthorized');return user;},async getDashboardData(id){assert.equal(id,'user-a');return data;},apiError(error){return {error:error.message};}};
+const imports = {'next/server':{NextResponse:{json:(body,options)=>({body,headers:options.headers})}},'drizzle-orm':{asc:v=>v,eq:(a,b)=>[a,b]},'@/db':{db},'@/db/schema':{coachMessages,planArchives,activityLogs,sleepLogs,journalEntries,groceryPurchases},'@/lib/server':server};
+const loaded={exports:{}};
+new Function('require','module','exports',code)(name=>imports[name] || require(name),loaded,loaded.exports);
+(async()=>{
+  const result=await loaded.exports.POST({});
+  assert.equal(selectedUser,'user-a');
+  assert.equal(result.body.format,'fitlife-account-export'); assert.equal(result.body.version,1);
+  assert.equal(result.body.groceriesAvailable,true);assert.deepEqual(result.body.groceryPurchaseState.purchasedKeys,['item']);assert.equal(result.body.meals.length,1); assert.equal(result.body.coachMessages.length,1);
+  const json=JSON.stringify(result.body);
+  assert.ok(!json.includes('secret-password-hash')); assert.ok(!json.includes('secret-recovery-hash')); assert.ok(!json.includes('secret-future-value'));
+  assert.match(result.headers['Cache-Control'],/no-store/); assert.match(result.headers['Content-Disposition'],/attachment/);
+  missingArchives=true; const noArchives=await loaded.exports.POST({});
+  assert.equal(noArchives.body.planArchivesAvailable,false);assert.equal(noArchives.headers['X-Fitlife-Archives-Available'],'false');
+  signedIn=false; assert.equal((await loaded.exports.POST({})).error,'unauthorized');
+  signedIn=true;originAllowed=false;assert.equal((await loaded.exports.POST({})).error,'origin blocked');
+  console.log('Export route mock checks passed; real database isolation and browser download not tested.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

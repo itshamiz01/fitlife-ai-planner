@@ -1,0 +1,26 @@
+# Read-only exercise reference
+
+The exercise reference presents 36 general movement descriptions for educational use. It is not the unfinished personalized workout generator, a prescription, an assessment of ability, or medical clearance. It does not generate or change workouts or meals, record workout history, recommend sets/repetitions/loads, or use AI. Descriptions have **not** been reviewed by a qualified exercise professional; the UI says so and asks users to seek individual advice before trying a movement.
+
+Before displaying the descriptions, the component asks about urgent symptoms, restrictions, injury or mobility limitations, and pregnancy/postpartum. Urgent symptoms receive urgent-help messaging. Missing, unsure or positive answers, age under 18, and age 65+ do not receive automatic guidance and are directed to a professional. These are conservative software gates, not a validated clinical screening tool or a statement that the person cannot exercise. Answers are held in browser component state and are not persisted or sent to a server or AI. Existing profile age is read; no other profile field is changed. Stop for pain, dizziness or discomfort.
+
+Each card contains a name, purpose, muscles, equipment, draft steps, breathing, common mistakes, precautions and possible easier/harder alternatives. Descriptions are searchable by movement, muscle or equipment. Each card links to a suggested YouTube video matched by exercise ID and search-result title. These videos have not been watched or independently reviewed; content, availability, movement, equipment and safety are not verified. Links open in a new tab and no video is embedded. Users should verify the demonstration and consult a qualified professional as appropriate. This is not a claim that the full workout system or personalized hydration is complete.
+
+No migration or database write is introduced. To roll back, remove the read-only component and its `views.tsx` rendering plus its CSS; this does not remove any profile, meal, workout, water or other records. `scripts/verify-exercise-reference-browser.cjs` uses a synthetic isolated database and checks safety gates, no writes, 36 cards, search, 36 matching link entries, no automatic YouTube requests, and viewport widths of 320/390/768/1440. It does not demonstrate clinical correctness, independent professional review, real-device accessibility, or exercise safety. Broader exercise-professional review remains outstanding.
+
+## Exercise reference expansion
+
+Sixteen lower-body and weighted-movement descriptions and suggested YouTube links have been added to the reference, bringing its total to 52. These additions are kept separate from the personalized workout draft and are not automatically assigned to any plan. The remaining requested chest, shoulder, arm, back, core, balance, cardio, mobility and band exercises have not yet been added. The new links are matched using indexed titles/descriptions, not by watching; availability, exercise variant and safety are unverified. The text itself also has not been professionally reviewed. No migration or existing-plan change is introduced. Roll back this stage by removing `src/lib/exercise-reference-additions.ts` and its reference-component import and rendering changes; existing records remain intact. `scripts/verify-exercise-reference-additions.cjs` checks data completeness and link shape, not video content. Lint, typecheck and a production build were run; browser and authenticated-production tests have not been run for this expansion.
+
+## Upper-body expansion
+
+Sixteen chest, shoulder and arm exercise descriptions and suggested YouTube links are added to the reference. The original 52 remain available. These cards are not included in the development workout generator or saved plans. Bench press, dips and overhead movements have specific equipment and safety notes; the descriptions do not establish personal suitability. Links are title/snippet matches only; neither the videos nor the descriptions have been reviewed by an exercise professional. The back, core, balance, cardio, mobility and band entries were added in subsequent stages. No database migration or existing records are changed. Roll back these new entries by removing the upper-body additions from `src/lib/exercise-reference-additions.ts` and reverting corresponding test counts. This stage does not change stored plans.
+
+
+## Core, balance, cardio, mobility and band expansion
+
+Twenty-nine more educational descriptions and suggested video links bring the reference to 108 entries. These remain separate from workout plans and include stop-for-pain and equipment safety information. Links were matched from indexed titles and snippets, not watched; exact video content and availability are unverified, as are the descriptions. The safety screen remains unchanged and is not clinical clearance. This expansion does not generate or change plans or require a database migration. Rollback: remove these additions and restore test counts; existing records remain untouched. The expansion has not received professional or real-device review.
+
+## Back expansion
+
+Eleven additional back exercise references and unreviewed suggested video links are included. Safety, content and video availability remain unverified. These are not assigned to workout plans.
