@@ -1,10 +1,17 @@
 package com.fitlifebro.steps
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import android.view.Gravity
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ScrollView
+import androidx.lifecycle.Lifecycle
 import androidx.activity.ComponentActivity
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -17,6 +24,11 @@ import java.text.NumberFormat
 /** Standalone test harness only: it does not connect to the website or sync health data. */
 class MainActivity : ComponentActivity() {
     private lateinit var status: TextView
+    private lateinit var sensorStatus: TextView
+    private lateinit var sensor: ForegroundSensorDraft
+    private val activityPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { allowed ->
+        if (allowed && lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) sensor.start() else sensorStatus.text = if (allowed) "Permission granted. Reopen this screen and start the sensor." else "Physical activity permission denied; no sensor data read."
+    }
     private val required = setOf(HealthPermission.getReadPermission(StepsRecord::class))
     private val requestAccess = registerForActivityResult(PermissionController.createRequestPermissionResultContract()) { granted ->
         if (granted.containsAll(required)) refresh() else status.text = "Steps permission not granted. No steps were read."
@@ -30,9 +42,21 @@ class MainActivity : ComponentActivity() {
         status = TextView(this).apply { text = "Not connected."; textSize = 20f }
         val connect = Button(this).apply { text = "Connect Health Connect"; setOnClickListener { connect() } }
         val refresh = Button(this).apply { text = "Refresh steps"; setOnClickListener { refresh() } }
-        page.addView(title); page.addView(explanation); page.addView(status); page.addView(connect); page.addView(refresh)
-        setContentView(page)
+        sensorStatus = TextView(this).apply { text = "Phone sensor: not started."; textSize = 18f }
+        sensor = ForegroundSensorDraft(this) { sensorStatus.text = it }
+        val sensorExplanation = TextView(this).apply { text = "Optional phone sensor test: permission is needed on Android 10+. Counts only while this screen stays open. Data is saved locally in partial segments, not synced. No GPS is used." }
+        val startSensor = Button(this).apply { text = "Start phone sensor test"; setOnClickListener { startSensor() } }
+        val stopSensor = Button(this).apply { text = "Stop phone sensor test"; setOnClickListener { sensor.stop() } }
+        page.addView(title); page.addView(sensorExplanation); page.addView(sensorStatus); page.addView(startSensor); page.addView(stopSensor); page.addView(explanation); page.addView(status); page.addView(connect); page.addView(refresh)
+        setContentView(ScrollView(this).apply { addView(page) })
     }
+
+    private fun startSensor() {
+        if (Build.VERSION.SDK_INT >= 29 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) activityPermission.launch(Manifest.permission.ACTIVITY_RECOGNITION)
+        else sensor.start()
+    }
+    override fun onStop() { if (::sensor.isInitialized) sensor.stop(); super.onStop() }
+    override fun onDestroy() { if (::sensor.isInitialized) sensor.close(); super.onDestroy() }
 
     private fun available() = HealthConnectClient.getSdkStatus(this) == HealthConnectClient.SDK_AVAILABLE
     private fun connect() {
