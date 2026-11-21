@@ -1,10 +1,15 @@
 import type { Profile, Meal, BudgetInfo } from "./types";
+import { recipeImage } from "./illustrative-image";
 import { dailyBudget, rupees } from "./types";
 import { recipes, recipeNutrition, compatibleRecipe, parseAllergies, PRICE_NOTE, type Recipe } from "./food-catalog";
 
 export const mealTypes = ["Breakfast", "Lunch", "Dinner", "Snack"];
 export const mealTimes = ["08:00", "12:30", "19:00", "16:00"];
 export const calorieShares = [.24, .30, .34, .12];
+// Optional workout slots are user-created, not automatically added to the daily plan.
+export function recipeMatchesMealType(recipe: Recipe, type: string) {
+  return type === "Pre-workout" || type === "Post-workout" ? Boolean(recipe.details?.categories.includes(type)) : recipe.types.includes(type);
+}
 export function recommendations(p: Pick<Profile, "age" | "gender" | "currentWeight" | "height" | "activity" | "goal"> & { workoutMinutes?: number }) {
   const minor = p.age < 18;
   const bmr = 10 * p.currentWeight + 6.25 * p.height - 5 * p.age + (p.gender === "male" ? 5 : p.gender === "female" ? -161 : -78);
@@ -17,19 +22,20 @@ export function recommendations(p: Pick<Profile, "age" | "gender" | "currentWeig
   };
 }
 export function servingForRecipe(profile: Profile, recipe: Recipe, mealType: string, day: number, time?: string) {
-  const slot = Math.max(0, mealTypes.indexOf(mealType));
+  const index = mealTypes.indexOf(mealType);
+  const slot = index < 0 ? 3 : index;
   const nutrition = recipeNutrition(recipe, (profile.calorieTarget || 2000) * calorieShares[slot]);
   const child = profile.age < 18;
   return {
     userId: profile.id, day, mealType, name: recipe.name,
     description: `${recipe.instructions}${child ? " Caregiver: this is a family recipe reference, not a prescribed child portion. Adapt texture and portions to age, appetite and professional guidance." : ""}`,
     portion: child ? "Family recipe reference · caregiver chooses serving" : "1 recipe serving · ingredient weights before cooking",
-    time: time || mealTimes[slot], image: recipe.image, completed: false,
+    time: time || mealTimes[slot], image: recipeImage(recipe.id), completed: false,
     recipeId: recipe.id, nutritionSource: "ingredient-reference-v1", ...nutrition,
   };
 }
 export function recipeCandidates(profile: Profile, mealType: string, day = 0) {
-  return recipes.filter(recipe => recipe.types.includes(mealType) && compatibleRecipe(recipe, profile)).map(recipe => ({ recipe, meal: servingForRecipe(profile, recipe, mealType, day) })).sort((a,b) => a.meal.costPaise - b.meal.costPaise || a.recipe.id.localeCompare(b.recipe.id));
+  return recipes.filter(recipe => recipeMatchesMealType(recipe, mealType) && compatibleRecipe(recipe, profile)).map(recipe => ({ recipe, meal: servingForRecipe(profile, recipe, mealType, day) })).sort((a,b) => a.meal.costPaise - b.meal.costPaise || a.recipe.id.localeCompare(b.recipe.id));
 }
 export function getBudgetInfo(profile: Profile, currentMeals: Pick<Meal,"costPaise">[] = []): BudgetInfo {
   const budget = dailyBudget(profile);
@@ -48,6 +54,9 @@ export function buildMealPlan(profile: Profile, demo = false) {
   const slots = mealTypes.map(type => recipeCandidates(profile, type));
   if (slots.some(slot => !slot.length) || slots.reduce((sum,slot) => sum + slot[0].meal.costPaise, 0) > budget) return [];
   const result: ReturnType<typeof servingForRecipe>[] = [];
+  const recipeCounts = new Map<string, number>();
+  const primaryCounts = new Map<string, number>();
+  const primary = (recipe: Recipe) => [...recipe.ingredients].sort((a,b) => b[1]-a[1])[0]?.[0] || "";
   const currentDay = (new Date().getDay() + 6) % 7;
   for (let day = 0; day < 7; day++) {
     const selected = slots.map(slot => slot[0]);
@@ -57,11 +66,16 @@ export function buildMealPlan(profile: Profile, demo = false) {
       let affordable = slots[index].filter(item => item.meal.costPaise + otherCost <= budget);
       const distinct = affordable.filter(item => !selected.some((choice,i) => i !== index && choice.recipe.id === item.recipe.id));
       if (distinct.length) affordable = distinct;
-      const preferred = affordable.filter(item => (profile.diet === "eggetarian" && item.recipe.ingredients.some(([id]) => id === "egg")) || (["balanced","nonvegetarian"].includes(profile.diet) && budget >= 12000 && item.recipe.ingredients.some(([id]) => id === "chicken")));
-      const choices = preferred.length ? preferred : affordable;
-      selected[index] = choices[(day + index) % choices.length];
+      // Prefer a recipe not served anywhere yesterday, not just in the same slot.
+      // Constraints win: relax this preference if no compatible option fits.
+      const yesterday = new Set(result.filter(item => item.day === day - 1).map(item => item.recipeId));
+      const notYesterday = affordable.filter(item => !yesterday.has(item.recipe.id));
+      if (notYesterday.length) affordable = notYesterday;
+      const score = (item: typeof affordable[number]) => (recipeCounts.get(item.recipe.id) || 0) * 100 + (primaryCounts.get(primary(item.recipe)) || 0) * 3;
+      affordable.sort((a,b) => score(a) - score(b) || a.meal.costPaise - b.meal.costPaise || a.recipe.id.localeCompare(b.recipe.id));
+      selected[index] = affordable[0];
     }
-    selected.forEach((item,index) => result.push({ ...item.meal, day, completed: demo && day === currentDay && index !== 2 }));
+    selected.forEach((item,index) => { recipeCounts.set(item.recipe.id, (recipeCounts.get(item.recipe.id) || 0) + 1); const ingredient = primary(item.recipe); primaryCounts.set(ingredient, (primaryCounts.get(ingredient) || 0) + 1); result.push({ ...item.meal, day, completed: demo && day === currentDay && index !== 2 }); });
   }
   return result;
 }

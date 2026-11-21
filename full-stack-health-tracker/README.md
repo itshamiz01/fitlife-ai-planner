@@ -44,7 +44,7 @@ Open `/install`, use the sidebar’s **Install Fit Life Bro** link, or use Setti
 
 The app has a manifest, standalone display mode, Android and maskable icons, Apple home-screen metadata, a service worker, and a self-contained offline connection screen. Only public icons, fonts, and build assets are cached. API responses, online HTML pages, health records, session data, and password forms are never cached by the service worker. Tracking and account access need an internet connection; there is no offline write queue.
 
-Installation does not enable background water alarms. Existing reminders only run while the app is open; phone browsers may pause timers when the app is backgrounded or the screen is locked. This is an installable web app, not an App Store or Play Store package.
+Installation alone does not enable background water alarms. Existing in-app reminders only run while the app is open; phone browsers may pause timers when backgrounded or locked. Optional closed-app Web Push requires separate server and per-device setup; see `docs/WATER_PUSH_SETUP.md` for limitations. This is an installable web app, not an App Store or Play Store package.
 
 ## Validation
 
